@@ -16,25 +16,25 @@ public:
 	long FC1 (long tiempoEvento, vector<long> eventos);
 
 	//Arribo de un mensaje a la computadora 1 del proc 1 de la computadora 2
-	int AMC1P1C2(long tiempoEvento,vector<long> eventos);
+	long AMC1P1C2(long tiempoEvento,vector<long> eventos);
 
 	//Arribo de un mensaje a la computadora 1 del proc 2 de la computadora 2
-	int AMC1P2C2(long tiempoEvento,vector<long> eventos);
+	long AMC1P2C2(long tiempoEvento,vector<long> eventos);
 
 	//Arribo de un mensaje a la computadora 1 de la computadora 3 
 	long AMC1C3(long tiempoEvento,vector<long> eventos);
 
 	//Arribo de un mensaje a la computadora 2 de la computadora 1
-	int AMC2C1(long tiempoEvento,vector<long> eventos);
+	long AMC2C1(long tiempoEvento,vector<long> eventos);
 
 	//Arribo de un mensaje a la computadora 2 desde afuera
-	int AMC2F(long tiempoEvento,vector<long> eventos);
+	long AMC2F(long tiempoEvento,vector<long> eventos);
 
 	//Finalizacion de procesamiento del mensaje en el proc 1 de la computadora 2
-	int EMC2P1(long tiempoEvento,vector<long> eventos);
+	long EMC2P1(long tiempoEvento,vector<long> eventos);
 
 	//Finalizacion de procesamiento del mensaje en el proc 2 de la computadora 2
-	int EMC2P2(long tiempoEvento,vector<long> eventos);
+	long EMC2P2(long tiempoEvento,vector<long> eventos);
 
 	//Arribo de mensaje a la computadora 3 de la computadora 1
 	long AMC3C1(long tiempoEvento,vector<long> eventos);
@@ -61,7 +61,9 @@ public:
 	long idMensajeGlobal;
 
 	//IdMensjaes que van a llegar a cierta compu
-	long arriboCompu1; 
+	long arriboCompu1C3;
+	long arriboCompu1P1;
+	long arriboCompu1P2;
 	long arriboCompu2;
 	long arriboCompu3;
 

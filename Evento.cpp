@@ -5,7 +5,9 @@
 
 Evento::Evento(double X1, double X2, double X3){
 	this->idMensajeGlobal = 0;
-	this->arriboCompu1  = 0; 
+	this->arriboCompu1C3  = 0;
+	this->arriboCompu1P1  = 0;
+	this->arriboCompu1P2  = 0; 
 	this-> arriboCompu2 = 0;
 	this->arriboCompu3 = 0;
 	this->X1 = X1; 
@@ -106,10 +108,59 @@ long Evento::FC1 ( long tiempoEvento, vector<long> eventos){
 }
 
 //Arribo de un mensaje a la computadora 1 del proc 1 de la computadora 2
-int Evento::AMC1P1C2(long tiempoEvento,vector<long> eventos){}
+long Evento::AMC1P1C2(long tiempoEvento,vector<long> eventos){
+	long relojEvento = tiempoEvento;
+	//Revisamos el proc1 a ver su estado
+	if(proc1){
+		//El proc1 esta ocupado por lo que el mensaje que llega lo metemos en la cola
+		colaProc1.push_back(this->arriboCompu1P1); // añadimos el id a la cola 
+		mensajes[this->arriboCompu1P1].tiempoEntradaCola = relojEvento; 
+
+	}else{
+		//El proc1 estaba disponible 
+		proc1 = true;
+		this->idMensajeP1 = arriboCompu1P1;
+		eventos[0] = relojEvento + D6(); // Programamos el fin de trabajo
+		mensajes[idMensajeP1].tiempoInicioTrabajo = relojEvento;
+	}
+	eventos[2] = 5000*4;// Desprograma el evento
+
+	//Debemos revisar la cola de transicion para poder asignar el proximo arribo
+	if (!colaTransmicion1.empty()){
+		this->arriboCompu1P1 = colaTransmicion1[0]; // asignamos cual sera el proximo en llegar
+		eventos[2] = mensajes[colaTransmicion1[0]].tiempoLlegada; // programamos la llegada a este evento por parte de un mensajeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+		colaTransmicion1.erase(colaTransmicion1.begin());
+	}
+	return relojEvento;
+}
 
 //Arribo de un mensaje a la computadora 1 del proc 2 de la computadora 2
-int Evento::AMC1P2C2(long tiempoEvento,vector<long> eventos){}
+long Evento::AMC1P2C2(long tiempoEvento,vector<long> eventos){
+	long relojEvento = tiempoEvento;
+	//Revisamos el proc1 a ver su estado
+	if(proc1){
+		//El proc1 esta ocupado por lo que el mensaje que llega lo metemos en la cola
+		colaProc1.push_back(this->arriboCompu1P2); // añadimos el id a la cola 
+		mensajes[this->arriboCompu1P2].tiempoEntradaCola = relojEvento; 
+
+	}else{
+		//El proc1 estaba disponible 
+		proc1 = true;
+		this->idMensajeP1 = arriboCompu1P2;
+		eventos[0] = relojEvento + D6(); // Programamos el fin de trabajo
+		mensajes[idMensajeP1].tiempoInicioTrabajo = relojEvento;
+	}
+	eventos[2] = 5000*4;// Desprograma el evento
+
+	//Debemos revisar la cola de transicion para poder asignar el proximo arribo
+	if (!colaTransmicion1.empty()){
+		this->arriboCompu1P2 = colaTransmicion1[0]; // asignamos cual sera el proximo en llegar
+		eventos[2] = mensajes[colaTransmicion1[0]].tiempoLlegada; // programamos la llegada a este evento por parte de un mensajeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+		colaTransmicion1.erase(colaTransmicion1.begin());
+	}
+	return relojEvento;
+
+}
 
 //Arribo de un mensaje a la computadora 1 de la computadora 3 
 long Evento::AMC1C3( long tiempoEvento, vector<long> eventos){
@@ -117,12 +168,12 @@ long Evento::AMC1C3( long tiempoEvento, vector<long> eventos){
 	//Se revisa para ver si el proc1 esta ocupado o no
 	if (proc1){
 		//El proc esta ocupado
-		colaProc1.push_back(this->arriboCompu1);
-		mensajes[arriboCompu1].tiempoEntradaCola = tiempoEvento;
+		colaProc1.push_back(this->arriboCompu1C3);
+		mensajes[arriboCompu1C3].tiempoEntradaCola = relojEvento;
 	}else{
 		//El proc1 no esta ocupado
 		proc1 = true;
-		this->idMensajeP1 = arriboCompu1; // Asignamos el mensaje en que esta siendo atendido por P1
+		this->idMensajeP1 = arriboCompu1C3; // Asignamos el mensaje en que esta siendo atendido por P1
 		eventos[0] = tiempoEvento + D6();
 		mensajes[idMensajeP1].tiempoInicioTrabajo = relojEvento;
 
@@ -132,7 +183,7 @@ long Evento::AMC1C3( long tiempoEvento, vector<long> eventos){
 	//Se revisa la cola de transicion para ver si hay mensajes que vienen de camino y si los hay ponemos ese valor como evento[1]
 	if (!colaTransmicion1.empty()){
 		eventos[1] = mensajes[colaTransmicion1[0]].tiempoLlegada; // RePrograma el arribo 
-		this->arriboCompu1 = colaTransmicion1[0]; // Se asigna id del mensaje para poder trabajar
+		this->arriboCompu1C3 = colaTransmicion1[0]; // Se asigna id del mensaje para poder trabajar
 		colaTransmicion1.erase(colaTransmicion1.begin());
 	}
 
@@ -141,7 +192,7 @@ long Evento::AMC1C3( long tiempoEvento, vector<long> eventos){
 }
 
 //Arribo de un mensaje a la computadora 2 de la computadora 1
-int Evento::AMC2C1(long tiempoEvento,vector<long> eventos){
+long Evento::AMC2C1(long tiempoEvento,vector<long> eventos){
 	long relojEvento = tiempoEvento;
 	//revisamos los proc2 y proc3
 	if (proc2 && proc3){
@@ -192,7 +243,7 @@ int Evento::AMC2C1(long tiempoEvento,vector<long> eventos){
 }
 
 //Arribo de un mensaje a la computadora 2 desde afuera
-int Evento::AMC2F(long tiempoEvento,vector<long> eventos){
+long Evento::AMC2F(long tiempoEvento,vector<long> eventos){
 	long relojEvento = tiempoEvento;
 	//Se revisan los procesadores a ver si alguno esta desocupado
 	Mensaje mensaje(this->idMensajeGlobal);
@@ -240,10 +291,95 @@ int Evento::AMC2F(long tiempoEvento,vector<long> eventos){
 }
 
 //Finalizacion de procesamiento del mensaje en el proc 1 de la computadora 2
-int Evento::EMC2P1(long tiempoEvento,vector<long> eventos){}
+long Evento::EMC2P1(long tiempoEvento,vector<long> eventos){
+	long relojEvento = tiempoEvento;
+	//Se envia un mensaje a la computadora 1
+	mensajes[idMensajeP2].tiempoTransmicion += 20; // estadisico
+	colaTransmicion1.push_back(idMensajeP2);
+	mensajes[idMensajeP2].tiempoLlegada = relojEvento +20; // Importanteeeee
+	
+	//Comprobamos si ya se programo el arribo a la computadora 1
+	if (eventos[2] == 5000*4) {
+		//Hemos de progrmar el siguiete arribo
+		eventos[2] = mensajes[colaTransmicion1[0]].tiempoLlegada; // Programamos
+		this->arriboCompu1P1 = colaTransmicion1[0];
+		colaTransmicion1.erase(colaTransmicion1.begin());
+	}
+
+	//Calculos estadisticos
+	long tiempoRealProc = relojEvento - mensajes[idMensajeP2].tiempoInicioTrabajo;
+	mensajes[idMensajeP2].tiempoRealProc += tiempoRealProc;
+	mensajes[idMensajeP2].tiempoProc2 += tiempoRealProc;
+
+	//Desprogramos valores de la simulacion
+	eventos[6] = 5000*4; // Desprogrmamos el evento
+	proc2 = false; // ya no esta ocupado 
+	mensajes[idMensajeP2].tiempoInicioTrabajo = 0; // por si acaso
+	this->idMensajeP2 = -1; // quitamos el mensaje actual
+
+	//Revisamos la cola de la compu2 a ver si hay algun mensaje en espera
+	if(colaProc2.size() != 0){
+		//existen mensajes esperando a ser atendidos
+		long tiempoEnCola = relojEvento - mensajes[colaProc2[0]].tiempoEntradaCola;
+		mensajes[colaProc2[0]].tiempoEnColas += tiempoEnCola;
+
+
+		proc2 = true; // Se ocupa el proc2
+		this->idMensajeP2 = colaProc2[0];
+		eventos[6] = relojEvento +  D2();
+		mensajes[idMensajeP2].tiempoInicioTrabajo = relojEvento;
+		colaProc2.erase(colaProc2.begin()); 
+
+	}
+
+	return relojEvento;
+}
 
 //Finalizacion de procesamiento del mensaje en el proc 2 de la computadora 2
-int Evento::EMC2P2(long tiempoEvento,vector<long> eventos){}
+long Evento::EMC2P2(long tiempoEvento,vector<long> eventos){
+	long relojEvento = tiempoEvento;
+	//Se envia un mensaje a la computadora 1
+	mensajes[idMensajeP3].tiempoTransmicion += 20; // estadisico
+	colaTransmicion1.push_back(idMensajeP3);
+	mensajes[idMensajeP3].tiempoLlegada = relojEvento +20; // Importanteeeee
+	
+	//Comprobamos si ya se programo el arribo a la computadora 1
+	if (eventos[3] == 5000*4) {
+		//Hemos de progrmar el siguiete arribo
+		eventos[3] = mensajes[colaTransmicion1[0]].tiempoLlegada; // Programamos
+		this->arriboCompu1P2 = colaTransmicion1[0];
+		colaTransmicion1.erase(colaTransmicion1.begin());
+	}
+
+	//Calculos estadisticos
+	long tiempoRealProc = relojEvento - mensajes[idMensajeP3].tiempoInicioTrabajo;
+	mensajes[idMensajeP3].tiempoRealProc += tiempoRealProc;
+	mensajes[idMensajeP3].tiempoProc3 += tiempoRealProc;
+
+	//Desprogramos valores de la simulacion
+	eventos[7] = 5000*4; // Desprogrmamos el evento
+	proc3 = false; // ya no esta ocupado 
+	mensajes[idMensajeP3].tiempoInicioTrabajo = 0; // por si acaso
+	this->idMensajeP3 = -1; // quitamos el mensaje actual
+
+	//Revisamos la cola de la compu2 a ver si hay algun mensaje en espera
+	if(colaProc2.size() != 0){
+		//existen mensajes esperando a ser atendidos
+		long tiempoEnCola = relojEvento - mensajes[colaProc2[0]].tiempoEntradaCola;
+		mensajes[colaProc2[0]].tiempoEnColas += tiempoEnCola;
+
+
+		proc3 = true; // Se ocupa el proc2
+		this->idMensajeP3 = colaProc2[0];
+		eventos[7] = relojEvento +  D2();
+		mensajes[idMensajeP3].tiempoInicioTrabajo = relojEvento;
+		colaProc2.erase(colaProc2.begin()); 
+
+	}
+
+	return relojEvento;
+
+}
 
 //Arribo de mensaje a la computadora 3 de la computadora 1
 long Evento::AMC3C1( long tiempoEvento,vector<long> eventos){
@@ -316,10 +452,10 @@ long Evento::Emc3(long tiempoEvento,vector<long> eventos){
 		mensajes[idMensajeP4].tiempoTransmicion += 20; 
 		mensajes[idMensajeP4].tiempoLlegada = relojEvento +20; // a esta hora va a llegar
 		colaTransmicion1.push_back(idMensajeP4); //Ponemos el mensaje en la cola de envios "canal"
-		if (eventos[1] == 5000*4){
+		if (eventos[1] == 5000*4 ){
 			//Se debe asignar el tiempo del primer elemento de la cola de transicion1 a este evento
 			eventos[1] = mensajes[colaTransmicion1[0]].tiempoLlegada;
-			this->arriboCompu1 = colaTransmicion1[0]; // el mensaje que va a llegar sera el que este de primero
+			this->arriboCompu1C3 = colaTransmicion1[0]; // el mensaje que va a llegar sera el que este de primero
 			colaTransmicion1.erase(colaTransmicion1.begin());
 		}
 
