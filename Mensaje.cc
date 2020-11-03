@@ -12,6 +12,9 @@ Mensaje::Mensaje(long id){
 	this->tiempoRealProc = 0 ; 
 	this->tiempoTransmicion  = 0;
 	this->tiempoEnColas = 0 ;
+	this->tiempoLlegada = 0;
+	this->tiempoInicioTrabajo = 0;
+	this->tiempoEntradaCola = 0;
 }
 
 Mensaje::~Mensaje(){}

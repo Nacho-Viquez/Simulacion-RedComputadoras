@@ -8,41 +8,41 @@ class Mensaje;
 class Evento
 {
 public:
-	Evento();
+	Evento(double X1, double X2, double X3);
 	~Evento();
 	//Declaracion de los eventos de la simulacion
 
 	//Finalización de procesamiento del mensaje de la computadora 1
-	long FC1 (long reloj,long tiempoEvento, vector<long> eventos);
+	long FC1 (long tiempoEvento, vector<long> eventos);
 
 	//Arribo de un mensaje a la computadora 1 del proc 1 de la computadora 2
-	int AMC1P1C2();
+	int AMC1P1C2(long tiempoEvento,vector<long> eventos);
 
 	//Arribo de un mensaje a la computadora 1 del proc 2 de la computadora 2
-	int AMC1P2C2();
+	int AMC1P2C2(long tiempoEvento,vector<long> eventos);
 
 	//Arribo de un mensaje a la computadora 1 de la computadora 3 
-	long AMC1C3(long reloj, long tiempoEvento,vector<long> eventos);
+	long AMC1C3(long tiempoEvento,vector<long> eventos);
 
 	//Arribo de un mensaje a la computadora 2 de la computadora 1
-	int AMC2C1();
+	int AMC2C1(long tiempoEvento,vector<long> eventos);
 
 	//Arribo de un mensaje a la computadora 2 desde afuera
-	int AMC2F();
+	int AMC2F(long tiempoEvento,vector<long> eventos);
 
 	//Finalizacion de procesamiento del mensaje en el proc 1 de la computadora 2
-	int EMC2P1();
+	int EMC2P1(long tiempoEvento,vector<long> eventos);
 
 	//Finalizacion de procesamiento del mensaje en el proc 2 de la computadora 2
-	int EMC2P2();
+	int EMC2P2(long tiempoEvento,vector<long> eventos);
 
 	//Arribo de mensaje a la computadora 3 de la computadora 1
-	long AMC3C1(long reloj, long tiempoEvento,vector<long> eventos);
+	long AMC3C1(long tiempoEvento,vector<long> eventos);
 
 	//Arribo de mensaje a la computadora 3 desde afuera
-	long AMC3F(long tiempoEvento, long idMensaje ,vector<long> eventos);
+	long AMC3F(long tiempoEvento, vector<long> eventos);
 	//Finalizacion de procesamiento del mensaje de la computadora 3
-	int Emc3();
+	long Emc3(long tiempoEvento,vector<long> eventos);
 
 	long D6();
 
@@ -50,8 +50,15 @@ public:
 
 	long D4();
 
+	long D3();
+
+	long D2();
+
+	long D1();
+
 	//Mensajes de la simulacion 
 	vector<Mensaje> mensajes;
+	long idMensajeGlobal;
 
 	//IdMensjaes que van a llegar a cierta compu
 	long arriboCompu1; 
@@ -79,7 +86,6 @@ public:
 	//Colas de mensajes en espera
 	vector<long> colaProc1;
 	vector<long> colaProc2;
-	vector<long> colaProc3;
 	vector<long> colaProc4;
 	
 };
