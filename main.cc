@@ -1,12 +1,13 @@
 #include "Mensaje.h"
 #include "Evento.h"
 
-long manejadorEventos(long reloj,vector<long> eventos, long indiceEventoProximo, Evento *evento){
-	long relojActual = reloj;
+long manejadorEventos(long reloj,vector<long> *eventos, long indiceEventoProximo, Evento *evento){
+	long relojActual = eventos->at(indiceEventoProximo);
+
 	switch(indiceEventoProximo){
 		//Computadora 1
 		case 0: //Finalización de procesamiento del mensaje de la computadora 1
-			relojActual = evento->FC1(relojActual, eventos);
+			relojActual = evento->FC1(relojActual,eventos);
 			break;
 		case 1: //Arribo de un mensaje a la computadora 1 de la computadora 3
 			relojActual = evento->AMC1C3(relojActual,eventos);
@@ -69,7 +70,7 @@ int main(int argc, char const *argv[])
 	eventos.resize(11, 5000*4);	 //Inicializamos todos los eventos en inf
 
 	//Valores iniciales a los eventos inciales
-	eventos[9] =  0;
+	eventos[5] = 0;
 	eventos[10] = 0;
 
 	
@@ -89,7 +90,13 @@ int main(int argc, char const *argv[])
 		cout<< "Hola este es el siguiente evento en pasar :"<< indiceEventoProximo<<" que tiene un valor de : "<<eventoProximo <<endl;
 
 		//Se realiza el siguiente evento indicado en indiceEventoProximo
-		reloj = manejadorEventos(reloj, eventos, indiceEventoProximo, evento);
+		reloj = manejadorEventos(reloj, &eventos, indiceEventoProximo, evento);
+
+		cout<<"eventos"<<endl;
+		for (int i = 0; i < 11; ++i)
+		{
+			cout<< "Evento"<< i<<"  tiene un valor de : "<<eventos[i] <<endl;
+		}
 
 
 	}

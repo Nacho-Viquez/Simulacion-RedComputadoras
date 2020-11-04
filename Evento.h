@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include<time.h>
 #include <vector>
+#include <math.h> 
 
 using namespace std;
 class Mensaje;
@@ -13,36 +14,47 @@ public:
 	//Declaracion de los eventos de la simulacion
 
 	//Finalización de procesamiento del mensaje de la computadora 1
-	long FC1 (long tiempoEvento, vector<long> eventos);
+	long FC1 (long tiempoEvento, vector<long> *eventos);
 
 	//Arribo de un mensaje a la computadora 1 del proc 1 de la computadora 2
-	long AMC1P1C2(long tiempoEvento,vector<long> eventos);
+	long AMC1P1C2(long tiempoEvento,vector<long> *eventos);
 
 	//Arribo de un mensaje a la computadora 1 del proc 2 de la computadora 2
-	long AMC1P2C2(long tiempoEvento,vector<long> eventos);
+	long AMC1P2C2(long tiempoEvento,vector<long> *eventos);
 
 	//Arribo de un mensaje a la computadora 1 de la computadora 3 
-	long AMC1C3(long tiempoEvento,vector<long> eventos);
+	long AMC1C3(long tiempoEvento,vector<long> *eventos);
 
 	//Arribo de un mensaje a la computadora 2 de la computadora 1
-	long AMC2C1(long tiempoEvento,vector<long> eventos);
+	long AMC2C1(long tiempoEvento,vector<long> *eventos);
 
 	//Arribo de un mensaje a la computadora 2 desde afuera
-	long AMC2F(long tiempoEvento,vector<long> eventos);
+	long AMC2F(long tiempoEvento,vector<long> *eventos);
 
 	//Finalizacion de procesamiento del mensaje en el proc 1 de la computadora 2
-	long EMC2P1(long tiempoEvento,vector<long> eventos);
+	long EMC2P1(long tiempoEvento,vector<long> *eventos);
 
 	//Finalizacion de procesamiento del mensaje en el proc 2 de la computadora 2
-	long EMC2P2(long tiempoEvento,vector<long> eventos);
+	long EMC2P2(long tiempoEvento,vector<long> *eventos);
 
 	//Arribo de mensaje a la computadora 3 de la computadora 1
-	long AMC3C1(long tiempoEvento,vector<long> eventos);
+	long AMC3C1(long tiempoEvento,vector<long> *eventos);
 
 	//Arribo de mensaje a la computadora 3 desde afuera
-	long AMC3F(long tiempoEvento, vector<long> eventos);
+	long AMC3F(long tiempoEvento, vector<long> *eventos);
 	//Finalizacion de procesamiento del mensaje de la computadora 3
-	long Emc3(long tiempoEvento,vector<long> eventos);
+	long Emc3(long tiempoEvento,vector<long> *eventos);
+
+	long DistribucionNormalMetodoDirecto(int miu, int varianza );
+
+	long DistribucionNormalMetodoTLC(int miu, int varianza);
+
+	long DistribucionUniforme(int a, int b);
+
+	long DistribucionExponencialParametro(double lambda); 
+
+	long DistribucionDensidad(double k, int a , int b);
+
 
 	long D6();
 
