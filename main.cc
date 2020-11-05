@@ -1,5 +1,6 @@
 #include "Mensaje.h"
 #include "Evento.h"
+#include <map>
 
 long manejadorEventos(long reloj,vector<long> *eventos, long indiceEventoProximo, Evento *evento){
 	long relojActual = eventos->at(indiceEventoProximo);
@@ -47,20 +48,104 @@ long manejadorEventos(long reloj,vector<long> *eventos, long indiceEventoProximo
 }
 
 
+void obtencionParametros(int escogencia, map<int, vector<double>> * map, int valorD){
+	double miu, varianza,a,b, k, lambda;
+
+	switch (escogencia){
+		case 1 : // Se ocupan dos parametros
+			/*
+			cout << "Digite el valor para mui: ";
+			cin>>miu ;
+			cout << "Digite el valor para la varianza: ";
+			cin>>varianza;*/
+			map->insert(pair< int, vector<double> > (valorD+1 , {1,15,1/*miu,varianza*/}));
+			break;
+		case 2: 
+			/*
+			cout << "Digite el valor para mui: ";
+			cin>>miu ;
+			cout << "Digite el valor para la varianza: ";
+			cin>>varianza;*/
+			map->insert(pair< int, vector<double> > (valorD+1 , {2,19,1/*miu,varianza*/}));
+			break;
+		case 3: 
+			/*
+			cout << "Digite el valor para a: ";
+			cin>>a ;
+			cout << "Digite el valor para la b: ";
+			cin>>b;*/
+			map->insert(pair< int, vector<double> > (valorD+1 , {3,12,25/*a,b*/}));
+			break; 
+		case 4: 
+			/*
+			cout << "Digite el valor para lambda: ";
+			cin>>lambda ;*/
+
+			map->insert(pair< int, vector<double> > (valorD+1 , {4,0.25/*lambda*/}));
+			break;
+		case 5:
+			/*
+			cout << "Digite el valor para k: ";
+			cin>>k ;
+			cout << "Digite el valor para a: ";
+			cin>>a;
+			cout << "Digite el valor para b: ";
+			cin>>b;*/
+			map->insert(pair< int, vector<double> > (valorD+1 , {5,0.0417,4,8 /*k, a,b*/}));
+			break;
+		default:
+			printf("default\n");
+	}
+
+}
+
+
 /*
  * main del proyecto 
 */
 int main(int argc, char const *argv[])
 {
-	
+	double X1 = 0.2;
+	double X2 = 0.8;
+	double X3 = 0.5;
+
+
 	//Pedir datos al usuario
-	double X1 = 0.23;
-	double X2 = 0.45;
-	double X3= 0.78;
+	//Probas
+	/*
+	cout << "Digite el valor para X1: "<< endl;
+	cin>>X1 ;
+	cout << "Digite el valor para X2: "<< endl;
+	cin>>X2 ;
+	cout << "Digite el valor para X3: "<< endl;
+	cin>>X3 ;
+	*/
+	map<int , vector<double>> mapaDistros;
+	//Seleccion de distros
+	int escogencia ; 
+	for (int i = 0; i <= 5; ++i)
+	{
+		escogencia = 0;
+		cout << "Ingrese la opcion que desea para D"<<i+1<<": "<<endl;
+		cout <<endl;
+		cout << "Opcion 1: Normal Metodo directo"<< endl;
+		cout << "Opcion 2: Normal Metodo TLC"<< endl;
+		cout << "Opcion 3: Uniforme"<< endl;
+		cout << "Opcion 4: Exponencial"<< endl;
+		cout << "Opcion 5: Densidad"<< endl;
+		cout <<endl;
+		cout << "Su seleccion: ";
+		cin >> escogencia;
+
+		obtencionParametros(escogencia, &mapaDistros, i);
+	}
+
+	
+
 
 
 	//Inicializacion de instancias de clases
-	Evento * evento = new Evento(X1,X2,X3);
+	Evento * evento = new Evento(X1,X2,X3, mapaDistros);
 
 
 	//Variables "globales" simulacion
@@ -90,7 +175,7 @@ int main(int argc, char const *argv[])
 		cout<< "Hola este es el siguiente evento en pasar :"<< indiceEventoProximo<<" que tiene un valor de : "<<eventoProximo <<endl;
 
 		//Se realiza el siguiente evento indicado en indiceEventoProximo
-		reloj = manejadorEventos(reloj, &eventos, indiceEventoProximo, evento);
+		reloj = manejadorEventos(reloj, &eventos, indiceEventoProximo, evento );
 
 		cout<<"eventos"<<endl;
 		for (int i = 0; i < 11; ++i)
@@ -100,8 +185,73 @@ int main(int argc, char const *argv[])
 
 
 	}
+
+
 	printf("Sali de esta picjaaaaaaaaaaaaaaaaaaaaaaa\n");
-	//Calculos finaless
+
+
+	//Prueba
+	/*
+	for (auto i = mapaDistros.begin(); i != mapaDistros.end(); ++i)
+	{
+		for (auto j = (*i).second.begin(); j != (*i).second.end(); ++j)
+		{
+			cout<< (*i).first << ": "<< (*j)<<endl;
+		}
+	}*/
+
+
+
+	//Calculos finales estadisticos 
+	//1.a
+	double porcentajeOcupadoProc1 = (evento->tiemposProcesadores[0]*100)/ 5000; 
+	double porcentajeOcupadoProc2 = (evento->tiemposProcesadores[1] *100)/ 5000; 
+	double porcentajeOcupadoProc3 = (evento->tiemposProcesadores[2] *100)/ 5000;
+	double porcentajeOcupadoProc4 = (evento->tiemposProcesadores[3]*100)/ 5000;
+	cout<< "Porcentaje del tiempo que pasa ocupado el procesador 1(compu1): "<<porcentajeOcupadoProc1 <<endl;
+	cout<< "Porcentaje del tiempo que pasa ocupado el procesador 2(compu2): "<<porcentajeOcupadoProc2 <<endl;
+	cout<< "Porcentaje del tiempo que pasa ocupado el procesador 3(compu3): "<<porcentajeOcupadoProc3 <<endl;
+	cout<< "Porcentaje del tiempo que pasa ocupado el procesador 4(compu4): "<<porcentajeOcupadoProc4 <<endl;
+
+
+
+	//1.b
+	double porcentajeP1Rechazado = (evento->tiempoProc1Perdidos *100)/ 5000;
+	double porcentajeP4Rechazado = (evento->tiempoProc4Perdidos*100)/ 5000;
+	cout<< "Porcentaje del tiempo que pasa ocupado el procesador 1(compu1) con mensajes desechados: "<<porcentajeP1Rechazado <<endl;
+	cout<< "Porcentaje del tiempo que pasa ocupado el procesador 4(compu3) con mensajes desechados: "<<porcentajeP4Rechazado <<endl;
+
+
+
+
+
+	//1.c
+	double porcentajeMensajesRechazdos = (evento->mensajesEliminados *100 )/ evento->mensajes.size();
+	cout<< "Porcentaje del total de mensajes rechazados: "<<porcentajeMensajesRechazdos <<endl;
+
+
+
+	//1.d
+	double promedioTiempoSistemaMensaje = evento->sumatoriaTiemposMensajes /5000;
+	cout<< "Tiempo promedio en el sistema por cada mensaje: "<<promedioTiempoSistemaMensaje <<endl;
+
+	//1.e
+	double numeroVecesDevuelto = evento->sumatoriaVecesDevuelto / evento->mensajes.size();
+	cout<< "Numero promedio de veces que un mensaje fue devuelto por la computadora 1:  "<<numeroVecesDevuelto <<endl;
+
+	//1.f 
+	double tiempoPromedioColas = evento->tiempoColas /5000;
+	cout<< "Tiempo promedio en colas: "<<tiempoPromedioColas <<endl;
+
+	//1.g
+	double tiempoPromedioTrans = evento->tiempoTransmicion / 5000;
+	cout<< "Tiempo promedio en trasnmicion: "<<tiempoPromedioTrans <<endl;
+
+
+	//1.h
+	double promedioTrabajoReal = (evento->sumatoriaTiempoReal *100)/ 5000;
+	cout<< "Porcentaje del tiempo total de cada mensaje que fue utilizado en procesamiendo real: "<<promedioTrabajoReal <<endl;
+
 
 	delete(evento);
 	return 0;

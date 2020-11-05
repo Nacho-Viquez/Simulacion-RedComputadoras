@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include<time.h>
 #include <vector>
+#include <map>
 #include <math.h> 
 
 using namespace std;
@@ -9,7 +10,7 @@ class Mensaje;
 class Evento
 {
 public:
-	Evento(double X1, double X2, double X3);
+	Evento(double X1, double X2, double X3, map<int, vector<double> > map);
 	~Evento();
 	//Declaracion de los eventos de la simulacion
 
@@ -45,28 +46,18 @@ public:
 	//Finalizacion de procesamiento del mensaje de la computadora 3
 	long Emc3(long tiempoEvento,vector<long> *eventos);
 
-	long DistribucionNormalMetodoDirecto(int miu, int varianza );
+	double DistribucionNormalMetodoDirecto(int miu, int varianza );
 
-	long DistribucionNormalMetodoTLC(int miu, int varianza);
+	double DistribucionNormalMetodoTLC(int miu, int varianza);
 
-	long DistribucionUniforme(int a, int b);
+	double DistribucionUniforme(int a, int b);
 
-	long DistribucionExponencialParametro(double lambda); 
+	double DistribucionExponencialParametro(double lambda); 
 
-	long DistribucionDensidad(double k, int a , int b);
+	double DistribucionDensidad(double k, int a , int b);
 
+	double Manejador(vector<double> v);
 
-	long D6();
-
-	long D5();
-
-	long D4();
-
-	long D3();
-
-	long D2();
-
-	long D1();
 
 	//Mensajes de la simulacion 
 	vector<Mensaje> mensajes;
@@ -85,6 +76,8 @@ public:
 	double X1; 
 	double X2; 
 	double X3; 
+	map<int, vector<double> > mapaD;
+
 	bool proc1; 
 	long idMensajeP1;// id del mensaje en el procesador 1 en este momento
 	bool proc2;
@@ -101,5 +94,15 @@ public:
 	vector<long> colaProc1;
 	vector<long> colaProc2;
 	vector<long> colaProc4;
-	
+
+	//Estructuras para estadisticas
+	vector<long> tiemposProcesadores;
+	long tiempoProc1Perdidos ; 
+	long tiempoProc4Perdidos ; 
+	long mensajesEliminados ;
+	long sumatoriaTiemposMensajes ; 
+	long sumatoriaVecesDevuelto;
+	long tiempoColas ;
+	long tiempoTransmicion;
+	long sumatoriaTiempoReal;
 };

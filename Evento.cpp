@@ -3,7 +3,7 @@
 
 #define PI 3.14159265
 
-Evento::Evento(double X1, double X2, double X3){
+Evento::Evento(double X1, double X2, double X3, map<int, vector<double> > mapaDistros){
 	this->idMensajeGlobal = 0;
 	this->arriboCompu1C3  = 0;
 	this->arriboCompu1P1  = 0;
@@ -27,6 +27,20 @@ Evento::Evento(double X1, double X2, double X3){
 	this->idMensajeP4 = -1; 
 
 	//Inicializacion para las probas
+	this->mapaD = mapaDistros;
+
+	//Estadisticas
+	this->tiemposProcesadores.resize(4,0);
+	this->tiempoProc1Perdidos = 0; 
+	this->tiempoProc4Perdidos = 0;
+	this->mensajesEliminados = 0;
+	this->sumatoriaTiemposMensajes = 0;
+	this->sumatoriaVecesDevuelto = 0;
+	this->tiempoColas = 0;
+	this->tiempoTransmicion = 0;
+	this->sumatoriaTiempoReal = 0;
+
+	srand(time(0));
 }
 
 Evento::~Evento(){}
@@ -35,7 +49,7 @@ Evento::~Evento(){}
 //Finalización de procesamiento del mensaje de la computadora 1
 long Evento::FC1 ( long tiempoEvento, vector<long> *eventos){
 	long relojEvento = tiempoEvento ; // Revisar -----------------------------------------------------
-	srand(time(NULL));
+	//srand(time(NULL));
 	double num = (rand()%101)/100 ;
 	if (mensajes[this->idMensajeP1].tiempoProc4 == 0){
 		//El mensaje proviene de la compu 2 
@@ -56,6 +70,14 @@ long Evento::FC1 ( long tiempoEvento, vector<long> *eventos){
 		}else {
 			//Se envia al destino(sale del sistema todo meco)
 			mensajes[this->idMensajeP1].estado = 2;
+			this->tiemposProcesadores[0] += mensajes[this->idMensajeP1].tiempoProc1; // Almacena tiempo en proc1
+			this->tiemposProcesadores[1] += mensajes[this->idMensajeP1].tiempoProc2; // Almacena tiempo en proc2
+			this->tiemposProcesadores[2] += mensajes[this->idMensajeP1].tiempoProc3; // Almacena tiempo en proc3
+			this->sumatoriaTiemposMensajes += (mensajes[this->idMensajeP1].tiempoTransmicion + mensajes[this->idMensajeP1].tiempoRealProc + mensajes[this->idMensajeP1].tiempoEnColas);
+			this->sumatoriaVecesDevuelto += mensajes[this->idMensajeP1].vecesDevuelto;
+			this->tiempoColas += mensajes[this->idMensajeP1].tiempoEnColas;
+			this->tiempoTransmicion += mensajes[this->idMensajeP1].tiempoTransmicion;
+			this->sumatoriaTiempoReal += mensajes[this->idMensajeP1].tiempoRealProc;
 		}
 	}else if (mensajes[this->idMensajeP1].tiempoProc2 == 0 && mensajes[this->idMensajeP1].tiempoProc3 == 0){
 		//El mensaje proviene de la compu 3
@@ -76,6 +98,13 @@ long Evento::FC1 ( long tiempoEvento, vector<long> *eventos){
 		}else {
 			//Se envia al destino (sale del sistema todo meco)
 			mensajes[this->idMensajeP1].estado = 2;
+			this->tiemposProcesadores[0] += mensajes[this->idMensajeP1].tiempoProc1; // Almacena tiempo en proc1
+			this->tiemposProcesadores[3] += mensajes[this->idMensajeP1].tiempoProc4; // Almacena tiempo en proc4
+			this->sumatoriaTiemposMensajes += (mensajes[this->idMensajeP1].tiempoTransmicion + mensajes[this->idMensajeP1].tiempoRealProc + mensajes[this->idMensajeP1].tiempoEnColas);
+			this->sumatoriaVecesDevuelto += mensajes[this->idMensajeP1].vecesDevuelto;
+			this->tiempoColas += mensajes[this->idMensajeP1].tiempoEnColas;
+			this->tiempoTransmicion += mensajes[this->idMensajeP1].tiempoTransmicion;
+			this->sumatoriaTiempoReal += mensajes[this->idMensajeP1].tiempoRealProc;
 		}
 	}
 	//Calculos probabilisticos
@@ -96,7 +125,8 @@ long Evento::FC1 ( long tiempoEvento, vector<long> *eventos){
 		mensajes[colaProc1[0]].tiempoEnColas += tiempoEnCola;
 		this->proc1 = true; //El proc1 vuelve a estar ocupado
 		this->idMensajeP1 = colaProc1[0];
-		eventos->at(0)  = relojEvento + D6() ;
+		map<int , vector<double> >::iterator map = mapaD.find(6);
+		eventos->at(0)  = relojEvento +	Manejador((*map).second);
 		mensajes[colaProc1[0]].tiempoInicioTrabajo = relojEvento; 
 		colaProc1.erase(colaProc1.begin()); // quitamos el consumido
 	}
@@ -120,7 +150,8 @@ long Evento::AMC1P1C2(long tiempoEvento,vector<long> *eventos){
 		//El proc1 estaba disponible 
 		proc1 = true;
 		this->idMensajeP1 = arriboCompu1P1;
-		eventos->at(0) = relojEvento + D6(); // Programamos el fin de trabajo
+		map<int , vector<double> >::iterator map = mapaD.find(6);
+		eventos->at(0) = relojEvento + Manejador((*map).second); // Programamos el fin de trabajo
 		mensajes[idMensajeP1].tiempoInicioTrabajo = relojEvento;
 	}
 	eventos->at(2) = 5000*4;// Desprograma el evento
@@ -131,6 +162,7 @@ long Evento::AMC1P1C2(long tiempoEvento,vector<long> *eventos){
 		eventos->at(2) = mensajes[colaTransmicion1[0]].tiempoLlegada ; // programamos la llegada a este evento por parte de un mensajeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 		colaTransmicion1.erase(colaTransmicion1.begin());
 	}
+
 	return relojEvento;
 }
 
@@ -147,7 +179,8 @@ long Evento::AMC1P2C2(long tiempoEvento,vector<long> *eventos){
 		//El proc1 estaba disponible 
 		proc1 = true;
 		this->idMensajeP1 = arriboCompu1P2;
-		eventos->at(0) = relojEvento + D6(); // Programamos el fin de trabajo
+		map<int , vector<double> >::iterator map = mapaD.find(6);
+		eventos->at(0) = relojEvento + Manejador((*map).second); // Programamos el fin de trabajo
 		mensajes[idMensajeP1].tiempoInicioTrabajo = relojEvento;
 	}
 	eventos->at(3) = 5000*4;// Desprograma el evento
@@ -158,6 +191,8 @@ long Evento::AMC1P2C2(long tiempoEvento,vector<long> *eventos){
 		eventos->at(3) = mensajes[colaTransmicion1[0]].tiempoLlegada; // programamos la llegada a este evento por parte de un mensajeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 		colaTransmicion1.erase(colaTransmicion1.begin());
 	}
+
+
 	return relojEvento;
 
 }
@@ -174,7 +209,8 @@ long Evento::AMC1C3( long tiempoEvento, vector<long> *eventos){
 		//El proc1 no esta ocupado
 		proc1 = true;
 		this->idMensajeP1 = arriboCompu1C3; // Asignamos el mensaje en que esta siendo atendido por P1
-		eventos->at(0) = tiempoEvento + D6();
+		map<int , vector<double> >::iterator map = mapaD.find(6);
+		eventos->at(0) = tiempoEvento + Manejador((*map).second);
 		mensajes[idMensajeP1].tiempoInicioTrabajo = relojEvento;
 
 	}
@@ -204,29 +240,33 @@ long Evento::AMC2C1(long tiempoEvento,vector<long> *eventos){
 		//El proc3 esta desocupado el mensaje se puede meter ahi 
 		proc3 = true; // El proc3 ahora esta ocupado
 		this->idMensajeP3 = this->arriboCompu2; // almacenamos el idMensaje
-		eventos->at(7) = relojEvento + D3(); // Alistamos el evento de salida
+		map<int , vector<double> >::iterator map = mapaD.find(3);
+		eventos->at(7) = relojEvento + Manejador((*map).second); // Alistamos el evento de salida
 		mensajes[this->arriboCompu2].tiempoInicioTrabajo = relojEvento; 
 	}else if (proc3 && !proc2){
 		//El proc2 esta desocupado el mensaje se puede meter ahi 
 		proc2 = true; 
 		this->idMensajeP2 = this->arriboCompu2; // asignamos el mensaje
-		eventos->at(6) = relojEvento + D2();
+		map<int , vector<double> >::iterator map = mapaD.find(2);
+		eventos->at(6) = relojEvento + Manejador((*map).second);
 		mensajes[this->arriboCompu2].tiempoInicioTrabajo = relojEvento;
 	}else {
 		//Si ambos estan desocupados se debe decidir a cual de los dos va a entrar
-		srand(time(NULL));
+		//srand(time(NULL));
 		double num = (rand()%101)/100 ;
 		if (num <= 0.5 ){
 			//Lo ponemos en el proc2
 			proc2 = true; 
 			this->idMensajeP2 = this->arriboCompu2; // asignamos el mensaje
-			eventos->at(6) = relojEvento + D2();
+			map<int , vector<double> >::iterator map = mapaD.find(2);
+			eventos->at(6) = relojEvento + Manejador((*map).second);
 			mensajes[this->arriboCompu2].tiempoInicioTrabajo = relojEvento;
 		}else{
 			//lo ponemos en el proc3
 			proc3 = true; // El proc3 ahora esta ocupado
 			this->idMensajeP3 = this->arriboCompu2; // almacenamos el idMensaje
-			eventos->at(7)= relojEvento + D3(); // Alistamos el evento de salida
+			map<int , vector<double> >::iterator map = mapaD.find(3);
+			eventos->at(7)= relojEvento + Manejador((*map).second); // Alistamos el evento de salida
 			mensajes[this->arriboCompu2].tiempoInicioTrabajo = relojEvento; 
 		}
 	}
@@ -244,7 +284,7 @@ long Evento::AMC2C1(long tiempoEvento,vector<long> *eventos){
 
 //Arribo de un mensaje a la computadora 2 desde afuera
 long Evento::AMC2F(long tiempoEvento,vector<long> *eventos){
-	printf("Entre al evento 5\n");
+	//printf("Entre al evento 5\n");
 	long relojEvento = tiempoEvento;
 	//Se revisan los procesadores a ver si alguno esta desocupado
 	Mensaje mensaje(this->idMensajeGlobal);
@@ -261,35 +301,40 @@ long Evento::AMC2F(long tiempoEvento,vector<long> *eventos){
 		//El proc3 esta desocupado el mensaje se puede meter ahi 
 		proc3 = true; // El proc3 ahora esta ocupado
 		this->idMensajeP3 = idMensaje; // almacenamos el idMensaje
-		eventos->at(7) = relojEvento + D3(); // Alistamos el evento de salida
+		map<int , vector<double> >::iterator map = mapaD.find(3);
+		eventos->at(7) = relojEvento + Manejador((*map).second); // Alistamos el evento de salida
 		mensajes[idMensaje].tiempoInicioTrabajo = relojEvento; 
 	}else if (proc3 && !proc2){
 		//El proc2 esta desocupado el mensaje se puede meter ahi 
 		proc2 = true; 
 		this->idMensajeP2 = idMensaje; // asignamos el mensaje
-		eventos->at(6) = relojEvento + D2();
+		map<int , vector<double> >::iterator map = mapaD.find(2);
+		eventos->at(6) = relojEvento + Manejador((*map).second);
 		mensajes[idMensaje].tiempoInicioTrabajo = relojEvento;
 	}else {
 		//Si ambos estan desocupados se debe decidir a cual de los dos va a entrar
-		srand(time(NULL));
+		//srand(time(NULL));
 		double num = (rand()%101)/100 ;
 		if (num <= 0.5 ){
 			//Lo ponemos en el proc2
 			proc2 = true; 
 			this->idMensajeP2 = idMensaje; // asignamos el mensaje
-			eventos->at(6) = relojEvento + D2();
+			map<int , vector<double> >::iterator map = mapaD.find(2);
+			eventos->at(6) = relojEvento + Manejador((*map).second);
 			mensajes[idMensaje].tiempoInicioTrabajo = relojEvento;
 		}else{
 			//lo ponemos en el proc3
 			proc3 = true; // El proc3 ahora esta ocupado
 			this->idMensajeP3 = idMensaje; // almacenamos el idMensaje
-			eventos->at(7) = relojEvento + D3(); // Alistamos el evento de salida
+			map<int , vector<double> >::iterator map = mapaD.find(3);
+			eventos->at(7) = relojEvento + Manejador((*map).second); // Alistamos el evento de salida
 			mensajes[idMensaje].tiempoInicioTrabajo = relojEvento; 
 		}
 	}
-	eventos->at(5) = relojEvento + D1();
-	cout<<"El evento 5 volvera a pasar en el tiempo: "<<eventos->at(5)<<endl;
-	cout <<"El reloj es de : "<< relojEvento<< endl;
+	map<int , vector<double> >::iterator map = mapaD.find(1);
+	eventos->at(5) = relojEvento + Manejador((*map).second);
+	//cout<<"El evento 5 volvera a pasar en el tiempo: "<<eventos->at(5)<<endl;
+	//cout <<"El reloj es de : "<< relojEvento<< endl;
 	return relojEvento;
 }
 
@@ -329,7 +374,8 @@ long Evento::EMC2P1(long tiempoEvento,vector<long> *eventos){
 
 		proc2 = true; // Se ocupa el proc2
 		this->idMensajeP2 = colaProc2[0];
-		eventos->at(6) = relojEvento +  D2();
+		map<int , vector<double> >::iterator map = mapaD.find(2);
+		eventos->at(6) = relojEvento +  Manejador((*map).second);
 		mensajes[idMensajeP2].tiempoInicioTrabajo = relojEvento;
 		colaProc2.erase(colaProc2.begin()); 
 
@@ -374,7 +420,8 @@ long Evento::EMC2P2(long tiempoEvento,vector<long> *eventos){
 
 		proc3 = true; // Se ocupa el proc2
 		this->idMensajeP3 = colaProc2[0];
-		eventos->at(7) = relojEvento +  D2();
+		map<int , vector<double> >::iterator map = mapaD.find(2);
+		eventos->at(7) = relojEvento +  Manejador((*map).second);
 		mensajes[idMensajeP3].tiempoInicioTrabajo = relojEvento;
 		colaProc2.erase(colaProc2.begin()); 
 
@@ -397,7 +444,8 @@ long Evento::AMC3C1( long tiempoEvento,vector<long> *eventos){
 		//Si encuentra el proc desocupado lo ponemos a trabajar
 		proc4 = true;
 		this->idMensajeP4 = arriboCompu3; // guardamos el valor del id del mensaje que esta en el procesador
-		eventos->at(8)= relojEvento + D5(); // Programamos la salida
+		map<int , vector<double> >::iterator map = mapaD.find(5);
+		eventos->at(8)= relojEvento + Manejador((*map).second); // Programamos la salida
 		mensajes[idMensajeP4].tiempoInicioTrabajo = relojEvento; // Iniciamos una toma del tiempo para el tiempo real y otros 
 
 	}
@@ -427,16 +475,18 @@ long Evento::AMC3F(long tiempoEvento,vector<long> *eventos){
 		mensajes[idMensaje].tiempoEntradaCola = relojEvento;
 	}else{
 		//Si el proc4 esta libre lo ponemos a trabajar
-		printf("Entre en donde es pa\n");
+		//printf("Entre en donde es pa\n");
 		proc4 = true;
 		this->idMensajeP4 = idMensaje;
-		eventos->at(8) = relojEvento + D5();
+		map<int , vector<double> >::iterator map = mapaD.find(5);
+		eventos->at(8) = relojEvento + Manejador((*map).second);
 		mensajes[idMensajeP4].tiempoInicioTrabajo = relojEvento;
 	}
-	eventos->at(10) = relojEvento +D4(); //Reprograma este mismo evento
+	map<int , vector<double> >::iterator map = mapaD.find(4);
+	eventos->at(10) = relojEvento +Manejador((*map).second); //Reprograma este mismo evento
 
-	cout <<"Cantidad de mensajes en el vector"<<this->mensajes.size()<<endl;
-	cout <<"El tiempo en el que volvere a pasar es : "<< eventos->at(10) <<endl;
+	//cout <<"Cantidad de mensajes en el vector"<<this->mensajes.size()<<endl;
+	//cout <<"El tiempo en el que volvere a pasar es : "<< eventos->at(10) <<endl;
 
 	return relojEvento;
 }
@@ -444,12 +494,21 @@ long Evento::AMC3F(long tiempoEvento,vector<long> *eventos){
 //Finalizacion de procesamiento del mensaje de la computadora 3
 long Evento::Emc3(long tiempoEvento,vector<long> *eventos){
 	long relojEvento = tiempoEvento;
-	srand(time(NULL));
+	//srand(time(NULL));
 	double num = (rand()%101)/100 ;
 	if(num <= this->X2){
 		//Se elimina el mensaje
 		mensajes[idMensajeP4].estado = 0;
-
+		this->tiemposProcesadores[0] += mensajes[this->idMensajeP4].tiempoProc1; // Almacena tiempo en proc1
+		this->tiemposProcesadores[3] += mensajes[this->idMensajeP4].tiempoProc4; // Almacena tiempo en proc3
+		this->tiempoProc1Perdidos += mensajes[this->idMensajeP4].tiempoProc1; //Almacena tiempo desperdiciado por proc1
+		this->tiempoProc4Perdidos += mensajes[this->idMensajeP4].tiempoProc4; //Almacena tiempo desperdiciado por proc4
+		this->mensajesEliminados++; // Aumentamos la cantidad de mensajes eliminados
+		this->sumatoriaTiemposMensajes += (mensajes[this->idMensajeP4].tiempoTransmicion + mensajes[this->idMensajeP4].tiempoRealProc + mensajes[this->idMensajeP4].tiempoEnColas);
+		this->sumatoriaVecesDevuelto += mensajes[this->idMensajeP4].vecesDevuelto;
+		this->tiempoColas += mensajes[this->idMensajeP4].tiempoEnColas;
+		this->tiempoTransmicion += mensajes[this->idMensajeP4].tiempoTransmicion;
+		this->sumatoriaTiempoReal += mensajes[this->idMensajeP4].tiempoRealProc;
 	}else{
 		//Se envia a el mensaje a la computadora 1
 		mensajes[idMensajeP4].tiempoTransmicion += 20; 
@@ -484,7 +543,8 @@ long Evento::Emc3(long tiempoEvento,vector<long> *eventos){
 		//Programamos valores utiles para el funcionamiento de la simulacion
 		proc4 = true; // el proc4 esta ocupado
 		this->idMensajeP4 = colaProc4[0]; 
-		eventos->at(8) = relojEvento + D5();
+		map<int , vector<double> >::iterator map = mapaD.find(5);
+		eventos->at(8) = relojEvento + Manejador((*map).second);
 		mensajes[this->idMensajeP4].tiempoInicioTrabajo = relojEvento;
 		colaProc4.erase(colaProc4.begin());
 	}
@@ -494,42 +554,50 @@ long Evento::Emc3(long tiempoEvento,vector<long> *eventos){
 }
 
 //Si da un valor negativo reintertar
-long Evento::DistribucionNormalMetodoDirecto(int miu, int varianza ){
-	srand(time(NULL));
-	double num1 = (rand()%101)/100 ;
-	double num2 = (rand()%101)/100 ;
+double Evento::DistribucionNormalMetodoDirecto(int miu, int varianza ){
+
+	double num1 = drand48() ;
+	//cout <<"num1"<< num1 <<endl;
+	double num2 = drand48() ;
+	//cout <<"num1"<< num2 <<endl;
 	long z = (-2* log(num1)) * cos( (num2 * 2*PI)* PI /180.0) ; 
-	long retorno = sqrt(varianza) * z + miu ;
+	//cout <<"z: "<< z <<endl;
+	double retorno = sqrt(varianza) * z + miu ;
+
 	return retorno;
 }
 
 //Si da un valor negativo reintertar
-long Evento::DistribucionNormalMetodoTLC(int miu, int varianza){
-	long retorno ; 
-	long z = 0;
-	srand(time(NULL));
+double Evento::DistribucionNormalMetodoTLC(int miu, int varianza){
+	double retorno ; 
+	double z = 0;
+	//srand(time(NULL));
 	//Sumatoria
-	for (int i = 1; i < 12; ++i)
+	for (int i = 1; i <= 12; ++i)
 	{
-		double num1 = (rand()%101)/100 ;
-		z += num1 - 6 ;
+		double num1 = drand48()  ;
+		
+		z += num1  ;
 	}
-	
+	//cout<<"El valor de la sumatoria es de :  "<< z <<endl;
+	z = z -6;
 	retorno = sqrt(varianza) * z + miu;
+	//cout<<"Este es el valor del metodo TLC: "<< retorno <<endl;
  	return retorno;
 }
 
-long Evento::DistribucionUniforme(int a, int b) {
-	srand(time(NULL));
-	double num1 = (rand()%101)/100 ;
-	long retorno = num1*(b - a)+a; 
+double Evento::DistribucionUniforme(int a, int b) {
+	//srand(time(NULL));
+	double num1 =drand48() ;
+	double retorno = num1*(b - a)+a; 
+	//cout<<"Este es el valor de la uniforme "<< retorno <<endl;
 	return retorno;
 }
 
-long Evento::DistribucionExponencialParametro(double lambda){
-	long retorno ;
-	srand(time(NULL));
-	double num1 = (rand()%101)/100 ;
+double Evento::DistribucionExponencialParametro(double lambda){
+	double retorno ;
+	//srand(time(NULL));
+	double num1 = drand48() ;
 	if(num1 != 1){
 		retorno =  (-log(1-num1)) / lambda;
 	}else if (num1 != 0){
@@ -538,37 +606,58 @@ long Evento::DistribucionExponencialParametro(double lambda){
 	return retorno;
 }
 
-long Evento::DistribucionDensidad(double k, int a , int b){
-	srand(time(NULL));
-	double num1 = (rand()%101)/100 ;
-	double division = -2* num1 / k;
+double Evento::DistribucionDensidad(double k, int a , int b){
+	//srand(time(NULL));
+	double num1 = drand48() ;
+	//cout<<"Este es el valor de num1 del de densidad : "<< num1 <<endl;
+	double division = 2* num1 / k;
+	//cout<<"Este es el valor de de la division del de densidad : "<< division <<endl;
 	double suma = division + (a*a);
-	long retorno = sqrt(suma);
+	//cout<<"Este es el valor de suma del de densidad : "<< suma <<endl;
+	double retorno = sqrt(suma);
+	//cout<<"Este es el valor de retorno del de densidad : "<< retorno <<endl;
 	return retorno;
 }
 
+double Evento::Manejador(vector<double> v){
+	int caso = v[0];
+	double valor;
+	switch(caso){
+		case 1:
+			valor = DistribucionNormalMetodoDirecto(v[1],v[2]);
+			//cout<<"Este es el valor del metodo directo: "<< valor <<endl;
+			while (valor < -1){
+				//cout<<"Este es el valor del metodo directo: "<< valor <<endl;
+				valor = DistribucionNormalMetodoDirecto(v[1],v[2]);
 
-long Evento::D6(){
+			}
+			
+			break;
+		case 2: 
+			valor = DistribucionNormalMetodoTLC(v[1], v[2]);
+			//cout<<"Este es el valor del metodo TLC: "<< valor <<endl;
+			while(valor < -1){
+				//cout<<"Este es el valor del metodo TLC: "<< valor <<endl;
+				valor = DistribucionNormalMetodoTLC(v[1], v[2]);
+				
+			}
+			
+			break;
+		case 3: 
+			valor = DistribucionUniforme(v[1], v[2]);
+			break;
+		case 4 : 
+			valor = DistribucionExponencialParametro(v[1]);
+			break;
+		case 5 : 
+			valor = DistribucionDensidad(v[1],v[2],v[3]);
+			//cout<<"Este es el valor del metodo de densidad: "<< valor <<endl;
+			//exit(0);
+			break;
+		default:
+			printf("default\n");
+	}
 
-	return 20;
+	return valor;
 }
 
-long Evento::D5(){
-	return 15;
-}
-
-long Evento::D4(){
-	return 200;
-}
-
-long Evento::D3(){
-	return 45;
-}
-
-long Evento::D2(){
-	return 35;
-}
-
-long Evento::D1(){
-	return 67;
-}
