@@ -14,6 +14,8 @@ public:
 	~Evento();
 	//Declaracion de los eventos de la simulacion
 
+	void LimpiarSimulacion();
+
 	//Finalización de procesamiento del mensaje de la computadora 1
 	long FC1 (long tiempoEvento, vector<long> *eventos);
 

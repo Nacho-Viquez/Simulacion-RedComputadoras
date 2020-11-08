@@ -45,13 +45,58 @@ Evento::Evento(double X1, double X2, double X3, map<int, vector<double> > mapaDi
 
 Evento::~Evento(){}
 
+void Evento::LimpiarSimulacion(){
+	this->idMensajeGlobal = 0;
+	this->arriboCompu1C3  = 0;
+	this->arriboCompu1P1  = 0;
+	this->arriboCompu1P2  = 0; 
+	this-> arriboCompu2 = 0;
+	this->arriboCompu3 = 0;
+
+	this->proc1 = false; //El proc1 esta desocupado al inicio 
+	this->idMensajeP1 = -1; 
+
+	this->proc2 = false; //El proc1 esta desocupado al inicio 
+	this->idMensajeP2 = -1; 
+
+	this->proc3 = false; //El proc1 esta desocupado al inicio 
+	this->idMensajeP3 = -1; 
+
+	this->proc4 = false; //El proc1 esta desocupado al inicio 
+	this->idMensajeP4 = -1; 
+
+	//Estadisticas
+	//this->tiemposProcesadores.resize(4,0);
+	for (int i = 0; i < tiemposProcesadores.size(); ++i)
+	{	
+		tiemposProcesadores[i] = 0;	
+	}
+	this->tiempoProc1Perdidos = 0; 
+	this->tiempoProc4Perdidos = 0;
+	this->mensajesEliminados = 0;
+	this->sumatoriaTiemposMensajes = 0;
+	this->sumatoriaVecesDevuelto = 0;
+	this->tiempoColas = 0;
+	this->tiempoTransmicion = 0;
+	this->sumatoriaTiempoReal = 0;
+	this->mensajes.clear();
+}
+
 
 //Finalización de procesamiento del mensaje de la computadora 1
 long Evento::FC1 ( long tiempoEvento, vector<long> *eventos){
-	long relojEvento = tiempoEvento ; // Revisar -----------------------------------------------------
+	long relojEvento = tiempoEvento ; 
 	//srand(time(NULL));
-	double num = (rand()%101)/100 ;
+	//Calculos probabilisticos
+	long tiempoRealProc = relojEvento - mensajes[this->idMensajeP1].tiempoInicioTrabajo;
+	mensajes[this->idMensajeP1].tiempoRealProc += tiempoRealProc;
+	mensajes[this->idMensajeP1].tiempoProc1 += tiempoRealProc;
+	//cout<<"------------- soy el mensaje: "<<this->idMensajeP1<<"-------------------" <<endl;
+
+	double num = drand48();
 	if (mensajes[this->idMensajeP1].tiempoProc4 == 0){
+		//printf("Me llego un mensaje de la cpmputadora 2\n");
+		//cout<<"Tiempo  proc4: "<< mensajes[this->idMensajeP1].tiempoProc4<<"Tiempo  proc2: "<< mensajes[this->idMensajeP1].tiempoProc2 <<" Tiempo  proc3: "<< mensajes[this->idMensajeP1].tiempoProc3 <<endl;
 		//El mensaje proviene de la compu 2 
 		if (num <= this->X1){
 			//El mensaje se va a reenviar a la compu 2 
@@ -80,23 +125,27 @@ long Evento::FC1 ( long tiempoEvento, vector<long> *eventos){
 			this->sumatoriaTiempoReal += mensajes[this->idMensajeP1].tiempoRealProc;
 		}
 	}else if (mensajes[this->idMensajeP1].tiempoProc2 == 0 && mensajes[this->idMensajeP1].tiempoProc3 == 0){
+		//printf("Me llego un mensaje de la computadora 3\n");
+		//cout<<"Tiempo  proc2: "<< mensajes[this->idMensajeP1].tiempoProc2 <<" Tiempo  proc3: "<< mensajes[this->idMensajeP1].tiempoProc3 <<endl;
 		//El mensaje proviene de la compu 3
 		if (num <= this->X3){
 			//Reenvia a la compu 3
+			//printf("Voy a reenviar el mensaje a la compu 3\n");
 			mensajes[this->idMensajeP1].tiempoTransmicion += 3;
 			long tiempollegada = tiempoEvento + 3;
 			mensajes[this->idMensajeP1].tiempoLlegada = tiempollegada;
 			mensajes[this->idMensajeP1].vecesDevuelto++;
 			colaTransmicion3.push_back(this->idMensajeP1);
-			if (eventos->at(3) == 5000*4){
+			if (eventos->at(9) == 5000*4){
 				//Ponemos que el primero de la cola de transicion es el que debe de llegar
-				eventos->at(3) = mensajes[colaTransmicion3[0]].tiempoLlegada;
+				eventos->at(9) = mensajes[colaTransmicion3[0]].tiempoLlegada;
 				this->arriboCompu3 = colaTransmicion3[0];
 				colaTransmicion3.erase(colaTransmicion3.begin());
 			}
 
 		}else {
 			//Se envia al destino (sale del sistema todo meco)
+			//printf("Voy a enviar el mensaje a su destino\n");
 			mensajes[this->idMensajeP1].estado = 2;
 			this->tiemposProcesadores[0] += mensajes[this->idMensajeP1].tiempoProc1; // Almacena tiempo en proc1
 			this->tiemposProcesadores[3] += mensajes[this->idMensajeP1].tiempoProc4; // Almacena tiempo en proc4
@@ -107,10 +156,7 @@ long Evento::FC1 ( long tiempoEvento, vector<long> *eventos){
 			this->sumatoriaTiempoReal += mensajes[this->idMensajeP1].tiempoRealProc;
 		}
 	}
-	//Calculos probabilisticos
-	long tiempoRealProc = relojEvento - mensajes[this->idMensajeP1].tiempoInicioTrabajo;
-	mensajes[this->idMensajeP1].tiempoRealProc += tiempoRealProc;
-	mensajes[this->idMensajeP1].tiempoProc1 += tiempoRealProc;
+	
 	
 	eventos->at(0) =5000*4;//Desprograma evento 1
 	
@@ -253,7 +299,7 @@ long Evento::AMC2C1(long tiempoEvento,vector<long> *eventos){
 	}else {
 		//Si ambos estan desocupados se debe decidir a cual de los dos va a entrar
 		//srand(time(NULL));
-		double num = (rand()%101)/100 ;
+		double num = drand48() ;
 		if (num <= 0.5 ){
 			//Lo ponemos en el proc2
 			proc2 = true; 
@@ -314,7 +360,7 @@ long Evento::AMC2F(long tiempoEvento,vector<long> *eventos){
 	}else {
 		//Si ambos estan desocupados se debe decidir a cual de los dos va a entrar
 		//srand(time(NULL));
-		double num = (rand()%101)/100 ;
+		double num = drand48();
 		if (num <= 0.5 ){
 			//Lo ponemos en el proc2
 			proc2 = true; 
@@ -493,15 +539,27 @@ long Evento::AMC3F(long tiempoEvento,vector<long> *eventos){
 
 //Finalizacion de procesamiento del mensaje de la computadora 3
 long Evento::Emc3(long tiempoEvento,vector<long> *eventos){
+	//cout<<"------------- soy el mensaje: "<<this->idMensajeP4<<"-------------------" <<endl;
+
 	long relojEvento = tiempoEvento;
 	//srand(time(NULL));
-	double num = (rand()%101)/100 ;
-	if(num <= this->X2){
+	//Calculos estadisticos
+	long tiempoRealProc = relojEvento - mensajes[idMensajeP4].tiempoInicioTrabajo;
+	//cout<<"Valores tiempoRealProc:  "<<relojEvento<<", "<<mensajes[idMensajeP4].tiempoInicioTrabajo <<endl;
+	mensajes[idMensajeP4].tiempoRealProc += tiempoRealProc;
+	mensajes[idMensajeP4].tiempoProc4 += tiempoRealProc;
+
+	double num = drand48();
+	if(num <= this->X2){ 
+		//printf("Eliminado\n");
 		//Se elimina el mensaje
 		mensajes[idMensajeP4].estado = 0;
+
 		this->tiemposProcesadores[0] += mensajes[this->idMensajeP4].tiempoProc1; // Almacena tiempo en proc1
+		//cout<<"Tiempo que pase en proc1: "<<this->mensajes[this->idMensajeP4].tiempoProc1 <<"----------------------------------------------------------------------------" <<endl;
 		this->tiemposProcesadores[3] += mensajes[this->idMensajeP4].tiempoProc4; // Almacena tiempo en proc3
 		this->tiempoProc1Perdidos += mensajes[this->idMensajeP4].tiempoProc1; //Almacena tiempo desperdiciado por proc1
+		//cout<<"Tiempo perdido  proc1: "<<mensajes[this->idMensajeP4].tiempoProc1 <<"------------- soy el mensaje: "<<this->idMensajeP4<<"-------------------" <<endl;
 		this->tiempoProc4Perdidos += mensajes[this->idMensajeP4].tiempoProc4; //Almacena tiempo desperdiciado por proc4
 		this->mensajesEliminados++; // Aumentamos la cantidad de mensajes eliminados
 		this->sumatoriaTiemposMensajes += (mensajes[this->idMensajeP4].tiempoTransmicion + mensajes[this->idMensajeP4].tiempoRealProc + mensajes[this->idMensajeP4].tiempoEnColas);
@@ -511,6 +569,7 @@ long Evento::Emc3(long tiempoEvento,vector<long> *eventos){
 		this->sumatoriaTiempoReal += mensajes[this->idMensajeP4].tiempoRealProc;
 	}else{
 		//Se envia a el mensaje a la computadora 1
+		//printf("A la comp1\n");
 		mensajes[idMensajeP4].tiempoTransmicion += 20; 
 		mensajes[idMensajeP4].tiempoLlegada = relojEvento +20; // a esta hora va a llegar
 		colaTransmicion1.push_back(idMensajeP4); //Ponemos el mensaje en la cola de envios "canal"
@@ -523,10 +582,8 @@ long Evento::Emc3(long tiempoEvento,vector<long> *eventos){
 
 	}
 
-	//Calculos estadisticos
-	long tiempoRealProc = relojEvento - mensajes[idMensajeP4].tiempoInicioTrabajo;
-	mensajes[idMensajeP4].tiempoRealProc += tiempoRealProc;
-	mensajes[idMensajeP4].tiempoProc4 += tiempoRealProc;
+	
+
 
 	//Desprogramamos valores de la simulacion
 	eventos->at(8) = 5000*4;

@@ -106,7 +106,7 @@ void obtencionParametros(int escogencia, map<int, vector<double>> * map, int val
 int main(int argc, char const *argv[])
 {
 	double X1 = 0.2;
-	double X2 = 0.8;
+	double X2 = 0.5;
 	double X3 = 0.5;
 
 
@@ -160,98 +160,107 @@ int main(int argc, char const *argv[])
 
 	
 	//Ciclo principal de la simulacion
+	for (int i = 0; i < 2; ++i)
+	{
+		while(reloj<= tiempoDuracionSimulacion ){
+			//Comprobacion de tiempo para siguiente accion
+			long eventoProximo = 5000*4; 
+			int indiceEventoProximo = 5000*4;
+			for (int i = 0; i < eventos.size(); ++i)
+			{
+				if ( eventos[i] < eventoProximo ){
+					eventoProximo = eventos[i];
+					indiceEventoProximo = i;
+				}
+			}
+			//cout<< "Hola este es el siguiente evento en pasar :"<< indiceEventoProximo<<" que tiene un valor de : "<<eventoProximo <<endl;
 
-	while(reloj<= tiempoDuracionSimulacion ){
-		//Comprobacion de tiempo para siguiente accion
-		long eventoProximo = 5000*4; 
-		int indiceEventoProximo = 5000*4;
-		for (int i = 0; i < eventos.size(); ++i)
+			//Se realiza el siguiente evento indicado en indiceEventoProximo
+			reloj = manejadorEventos(reloj, &eventos, indiceEventoProximo, evento );
+			/*
+			cout<<"eventos"<<endl;
+			for (int i = 0; i < 11; ++i)
+			{
+				cout<< "Evento"<< i<<"  tiene un valor de : "<<eventos[i] <<endl;
+			}*/
+		}
+
+
+		printf("Sali de la simulacion---------------------------------------------------------------------\n");
+
+
+		//Prueba
+		/*
+		for (auto i = mapaDistros.begin(); i != mapaDistros.end(); ++i)
 		{
-			if ( eventos[i] < eventoProximo ){
-				eventoProximo = eventos[i];
-				indiceEventoProximo = i;
+			for (auto j = (*i).second.begin(); j != (*i).second.end(); ++j)
+			{
+				cout<< (*i).first << ": "<< (*j)<<endl;
+			}
+		}*/
+
+		//Calculos finales estadisticos 
+		//1.a
+		double porcentajeOcupadoProc1 = (evento->tiemposProcesadores[0]*100)/ 5000; 
+		double porcentajeOcupadoProc2 = (evento->tiemposProcesadores[1] *100)/ 5000; 
+		double porcentajeOcupadoProc3 = (evento->tiemposProcesadores[2] *100)/ 5000;
+		double porcentajeOcupadoProc4 = (evento->tiemposProcesadores[3]*100)/ 5000;
+		cout<< "Porcentaje del tiempo que pasa ocupado el procesador 1(compu1): "<<porcentajeOcupadoProc1 <<endl;
+		cout<< "Porcentaje del tiempo que pasa ocupado el procesador 2(compu2): "<<porcentajeOcupadoProc2 <<endl;
+		cout<< "Porcentaje del tiempo que pasa ocupado el procesador 3(compu3): "<<porcentajeOcupadoProc3 <<endl;
+		cout<< "Porcentaje del tiempo que pasa ocupado el procesador 4(compu4): "<<porcentajeOcupadoProc4 <<endl;
+
+		//1.b
+		double porcentajeP1Rechazado = (evento->tiempoProc1Perdidos *100)/ 5000.0 ;
+		double porcentajeP4Rechazado = (evento->tiempoProc4Perdidos*100)/ 5000.0 ;
+		cout<< "Porcentaje del tiempo que pasa ocupado el procesador 1(compu1) con mensajes desechados: "<<porcentajeP1Rechazado <<endl;
+		cout<< "Porcentaje del tiempo que pasa ocupado el procesador 4(compu3) con mensajes desechados: "<<porcentajeP4Rechazado <<endl;
+
+		//1.c
+		double porcentajeMensajesRechazdos = (evento->mensajesEliminados *100.0 )/ evento->mensajes.size();
+		cout<< "Porcentaje del total de mensajes rechazados: "<<porcentajeMensajesRechazdos <<endl;
+
+		//1.d
+		double promedioTiempoSistemaMensaje = evento->sumatoriaTiemposMensajes /5000.0;
+		cout<< "Tiempo promedio en el sistema por cada mensaje: "<<promedioTiempoSistemaMensaje <<endl;
+
+		//1.e
+		double cantidad = 0.0;
+		for (int i = 0; i < evento->mensajes.size(); ++i)
+		{
+			if( !(evento->mensajes[i].estado == 1)){
+
+				cantidad++;			
 			}
 		}
-		cout<< "Hola este es el siguiente evento en pasar :"<< indiceEventoProximo<<" que tiene un valor de : "<<eventoProximo <<endl;
+		
+		double numeroVecesDevuelto = evento->sumatoriaVecesDevuelto  / cantidad;
+		cout<< "Numero promedio de veces que un mensaje fue devuelto por la computadora 1:  "<<numeroVecesDevuelto <<endl;
 
-		//Se realiza el siguiente evento indicado en indiceEventoProximo
-		reloj = manejadorEventos(reloj, &eventos, indiceEventoProximo, evento );
+		//1.f 
+		double tiempoPromedioColas = evento->tiempoColas /5000.0;
+		cout<< "Tiempo promedio en colas: "<<tiempoPromedioColas <<endl;
 
-		cout<<"eventos"<<endl;
-		for (int i = 0; i < 11; ++i)
+		//1.g
+		double tiempoPromedioTrans = evento->tiempoTransmicion / 5000.0;
+		cout<< "Tiempo promedio en trasnmicion: "<<tiempoPromedioTrans <<endl;
+
+		//1.h
+		double promedioTrabajoReal = (evento->sumatoriaTiempoReal *100)/ 5000.0;
+		cout<< "Porcentaje del tiempo total de cada mensaje que fue utilizado en procesamiendo real: "<<promedioTrabajoReal <<endl;
+
+		//Reseteamos valores para la siguiente corrida
+		for (int i = 0; i < eventos.size(); ++i)
 		{
-			cout<< "Evento"<< i<<"  tiene un valor de : "<<eventos[i] <<endl;
+			eventos[i] = 5000*4;
 		}
-
+		eventos[5] = 0;
+		eventos[10] = 0;
+		evento->LimpiarSimulacion();
+		reloj = 0;
 
 	}
-
-
-	printf("Sali de esta picjaaaaaaaaaaaaaaaaaaaaaaa\n");
-
-
-	//Prueba
-	/*
-	for (auto i = mapaDistros.begin(); i != mapaDistros.end(); ++i)
-	{
-		for (auto j = (*i).second.begin(); j != (*i).second.end(); ++j)
-		{
-			cout<< (*i).first << ": "<< (*j)<<endl;
-		}
-	}*/
-
-
-
-	//Calculos finales estadisticos 
-	//1.a
-	double porcentajeOcupadoProc1 = (evento->tiemposProcesadores[0]*100)/ 5000; 
-	double porcentajeOcupadoProc2 = (evento->tiemposProcesadores[1] *100)/ 5000; 
-	double porcentajeOcupadoProc3 = (evento->tiemposProcesadores[2] *100)/ 5000;
-	double porcentajeOcupadoProc4 = (evento->tiemposProcesadores[3]*100)/ 5000;
-	cout<< "Porcentaje del tiempo que pasa ocupado el procesador 1(compu1): "<<porcentajeOcupadoProc1 <<endl;
-	cout<< "Porcentaje del tiempo que pasa ocupado el procesador 2(compu2): "<<porcentajeOcupadoProc2 <<endl;
-	cout<< "Porcentaje del tiempo que pasa ocupado el procesador 3(compu3): "<<porcentajeOcupadoProc3 <<endl;
-	cout<< "Porcentaje del tiempo que pasa ocupado el procesador 4(compu4): "<<porcentajeOcupadoProc4 <<endl;
-
-
-
-	//1.b
-	double porcentajeP1Rechazado = (evento->tiempoProc1Perdidos *100)/ 5000;
-	double porcentajeP4Rechazado = (evento->tiempoProc4Perdidos*100)/ 5000;
-	cout<< "Porcentaje del tiempo que pasa ocupado el procesador 1(compu1) con mensajes desechados: "<<porcentajeP1Rechazado <<endl;
-	cout<< "Porcentaje del tiempo que pasa ocupado el procesador 4(compu3) con mensajes desechados: "<<porcentajeP4Rechazado <<endl;
-
-
-
-
-
-	//1.c
-	double porcentajeMensajesRechazdos = (evento->mensajesEliminados *100 )/ evento->mensajes.size();
-	cout<< "Porcentaje del total de mensajes rechazados: "<<porcentajeMensajesRechazdos <<endl;
-
-
-
-	//1.d
-	double promedioTiempoSistemaMensaje = evento->sumatoriaTiemposMensajes /5000;
-	cout<< "Tiempo promedio en el sistema por cada mensaje: "<<promedioTiempoSistemaMensaje <<endl;
-
-	//1.e
-	double numeroVecesDevuelto = evento->sumatoriaVecesDevuelto / evento->mensajes.size();
-	cout<< "Numero promedio de veces que un mensaje fue devuelto por la computadora 1:  "<<numeroVecesDevuelto <<endl;
-
-	//1.f 
-	double tiempoPromedioColas = evento->tiempoColas /5000;
-	cout<< "Tiempo promedio en colas: "<<tiempoPromedioColas <<endl;
-
-	//1.g
-	double tiempoPromedioTrans = evento->tiempoTransmicion / 5000;
-	cout<< "Tiempo promedio en trasnmicion: "<<tiempoPromedioTrans <<endl;
-
-
-	//1.h
-	double promedioTrabajoReal = (evento->sumatoriaTiempoReal *100)/ 5000;
-	cout<< "Porcentaje del tiempo total de cada mensaje que fue utilizado en procesamiendo real: "<<promedioTrabajoReal <<endl;
-
+	
 
 	delete(evento);
 	return 0;
