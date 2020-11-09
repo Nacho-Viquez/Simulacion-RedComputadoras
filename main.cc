@@ -246,7 +246,6 @@ int main(int argc, char const *argv[])
 		cout<< "Numero promedio de veces que un mensaje fue devuelto por la computadora 1:  "<<numeroVecesDevuelto <<endl;
 
 		//1.f 
-		cout <<"Prueba colas : "<< evento->tiempoColas << endl;
 		double tiempoPromedioColas = evento->tiempoColas /tiempoTotal+ 0.0;
 		cout<< "Tiempo promedio en colas: "<<tiempoPromedioColas <<endl;
 
@@ -255,7 +254,7 @@ int main(int argc, char const *argv[])
 		cout<< "Tiempo promedio en trasnmicion: "<<tiempoPromedioTrans <<endl;
 
 		//1.h
-		double promedioTrabajoReal = (evento->sumatoriaTiempoReal *100)/ evento->sumatoriaTiemposMensajes+ 0.0;
+		double promedioTrabajoReal = (evento->sumatoriaTiempoReal *100.0)/ evento->sumatoriaTiemposMensajes+ 0.0;
 		cout<< "Porcentaje del tiempo total de cada mensaje que fue utilizado en procesamiendo real: "<<promedioTrabajoReal <<endl;
 
 		//Reseteamos valores para la siguiente corrida
