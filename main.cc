@@ -256,7 +256,6 @@ int main(int argc, char const *argv[])
 		//1.h
 		double promedioTrabajoReal = (evento->sumatoriaTiempoReal *100.0)/ evento->sumatoriaTiemposMensajes+ 0.0;
 		cout<< "Porcentaje del tiempo total de cada mensaje que fue utilizado en procesamiendo real: "<<promedioTrabajoReal <<endl;
-
 		//Reseteamos valores para la siguiente corrida
 		for (int i = 0; i < eventos.size(); ++i)
 		{
