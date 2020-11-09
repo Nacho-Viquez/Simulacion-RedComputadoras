@@ -10,7 +10,7 @@ class Mensaje;
 class Evento
 {
 public:
-	Evento(double X1, double X2, double X3, map<int, vector<double> > map);
+	Evento(double X1, double X2, double X3, map<int, vector<double> > map, long tiempo);
 	~Evento();
 	//Declaracion de los eventos de la simulacion
 
@@ -35,10 +35,10 @@ public:
 	long AMC2F(long tiempoEvento,vector<long> *eventos);
 
 	//Finalizacion de procesamiento del mensaje en el proc 1 de la computadora 2
-	long EMC2P1(long tiempoEvento,vector<long> *eventos);
+	long FC2P1(long tiempoEvento,vector<long> *eventos);
 
 	//Finalizacion de procesamiento del mensaje en el proc 2 de la computadora 2
-	long EMC2P2(long tiempoEvento,vector<long> *eventos);
+	long FC2P2(long tiempoEvento,vector<long> *eventos);
 
 	//Arribo de mensaje a la computadora 3 de la computadora 1
 	long AMC3C1(long tiempoEvento,vector<long> *eventos);
@@ -46,7 +46,7 @@ public:
 	//Arribo de mensaje a la computadora 3 desde afuera
 	long AMC3F(long tiempoEvento, vector<long> *eventos);
 	//Finalizacion de procesamiento del mensaje de la computadora 3
-	long Emc3(long tiempoEvento,vector<long> *eventos);
+	long FC3(long tiempoEvento,vector<long> *eventos);
 
 	double DistribucionNormalMetodoDirecto(int miu, int varianza );
 
@@ -64,6 +64,7 @@ public:
 	//Mensajes de la simulacion 
 	vector<Mensaje> mensajes;
 	long idMensajeGlobal;
+	long tiempoSimulacion ;
 
 	//IdMensjaes que van a llegar a cierta compu
 	long arriboCompu1C3;

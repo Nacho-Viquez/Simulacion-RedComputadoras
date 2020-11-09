@@ -25,6 +25,7 @@ public:
 	long tiempoLlegada;
 	long tiempoInicioTrabajo;
 	long tiempoEntradaCola;
+	
 
 
 };

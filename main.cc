@@ -27,13 +27,13 @@ long manejadorEventos(long reloj,vector<long> *eventos, long indiceEventoProximo
 			relojActual = evento->AMC2F(relojActual,eventos);
 			break;
 		case 6: //Finalizacion de procesamiento del mensaje en el proc 1 de la computadora 2
-			relojActual = evento->EMC2P1(relojActual,eventos);
+			relojActual = evento->FC2P1(relojActual,eventos);
 			break;
 		case 7: //Finalizacion de procesamiento del mensaje en el proc 2 de la computadora 2
-			relojActual = evento->EMC2P2(relojActual,eventos);
+			relojActual = evento->FC2P2(relojActual,eventos);
 			break;
 		case 8: //Finalizacion de procesamiento del mensaje de la computadora 3
-			relojActual = evento->Emc3(relojActual,eventos);
+			relojActual = evento->FC3(relojActual,eventos);
 			break;
 		case 9: //Arribo de mensaje a la computadora 3 de la computadora 1
 			relojActual = evento->AMC3C1(relojActual,eventos);
@@ -91,7 +91,7 @@ void obtencionParametros(int escogencia, map<int, vector<double>> * map, int val
 			cin>>a;
 			cout << "Digite el valor para b: ";
 			cin>>b;*/
-			map->insert(pair< int, vector<double> > (valorD+1 , {5,0.0417,4,8 /*k, a,b*/}));
+			map->insert(pair< int, vector<double> > (valorD+1 , {5,0+ 0.0417,4,8 /*k, a,b*/}));
 			break;
 		default:
 			printf("default\n");
@@ -108,9 +108,17 @@ int main(int argc, char const *argv[])
 	double X1 = 0.2;
 	double X2 = 0.5;
 	double X3 = 0.5;
+	double tiempoTotal = 0.0;
+	int corridas = 0;
 
 
 	//Pedir datos al usuario
+	cout << "Indique cuanto tiempo va a durar la simulacion:";
+	cin>> tiempoTotal;
+	cout <<endl;
+	cout << "Indique cuantas veces quiere de la simulacion:";
+	cin>> corridas;
+	cout <<endl;
 	//Probas
 	/*
 	cout << "Digite el valor para X1: "<< endl;
@@ -145,14 +153,14 @@ int main(int argc, char const *argv[])
 
 
 	//Inicializacion de instancias de clases
-	Evento * evento = new Evento(X1,X2,X3, mapaDistros);
+	Evento * evento = new Evento(X1,X2,X3, mapaDistros,tiempoTotal);
 
 
 	//Variables "globales" simulacion
 	long reloj = 0;
-	long tiempoDuracionSimulacion = 5000;
+	long tiempoDuracionSimulacion = tiempoTotal;
 	vector<long> eventos; //Vector para los tiempos de ejecucion de los eventos
-	eventos.resize(11, 5000*4);	 //Inicializamos todos los eventos en inf
+	eventos.resize(11, tiempoTotal*4);	 //Inicializamos todos los eventos en inf
 
 	//Valores iniciales a los eventos inciales
 	eventos[5] = 0;
@@ -160,12 +168,12 @@ int main(int argc, char const *argv[])
 
 	
 	//Ciclo principal de la simulacion
-	for (int i = 0; i < 2; ++i)
+	for (int i = 0; i < corridas; ++i)
 	{
 		while(reloj<= tiempoDuracionSimulacion ){
 			//Comprobacion de tiempo para siguiente accion
-			long eventoProximo = 5000*4; 
-			int indiceEventoProximo = 5000*4;
+			long eventoProximo = tiempoTotal*4; 
+			int indiceEventoProximo = tiempoTotal*4;
 			for (int i = 0; i < eventos.size(); ++i)
 			{
 				if ( eventos[i] < eventoProximo ){
@@ -201,31 +209,31 @@ int main(int argc, char const *argv[])
 
 		//Calculos finales estadisticos 
 		//1.a
-		double porcentajeOcupadoProc1 = (evento->tiemposProcesadores[0]*100)/ 5000; 
-		double porcentajeOcupadoProc2 = (evento->tiemposProcesadores[1] *100)/ 5000; 
-		double porcentajeOcupadoProc3 = (evento->tiemposProcesadores[2] *100)/ 5000;
-		double porcentajeOcupadoProc4 = (evento->tiemposProcesadores[3]*100)/ 5000;
+		double porcentajeOcupadoProc1 = (evento->tiemposProcesadores[0]*100)/ tiempoTotal; 
+		double porcentajeOcupadoProc2 = (evento->tiemposProcesadores[1] *100)/ tiempoTotal; 
+		double porcentajeOcupadoProc3 = (evento->tiemposProcesadores[2] *100)/ tiempoTotal;
+		double porcentajeOcupadoProc4 = (evento->tiemposProcesadores[3]*100)/ tiempoTotal;
 		cout<< "Porcentaje del tiempo que pasa ocupado el procesador 1(compu1): "<<porcentajeOcupadoProc1 <<endl;
 		cout<< "Porcentaje del tiempo que pasa ocupado el procesador 2(compu2): "<<porcentajeOcupadoProc2 <<endl;
 		cout<< "Porcentaje del tiempo que pasa ocupado el procesador 3(compu3): "<<porcentajeOcupadoProc3 <<endl;
 		cout<< "Porcentaje del tiempo que pasa ocupado el procesador 4(compu4): "<<porcentajeOcupadoProc4 <<endl;
 
 		//1.b
-		double porcentajeP1Rechazado = (evento->tiempoProc1Perdidos *100)/ 5000.0 ;
-		double porcentajeP4Rechazado = (evento->tiempoProc4Perdidos*100)/ 5000.0 ;
+		double porcentajeP1Rechazado = (evento->tiempoProc1Perdidos *100)/ evento->tiemposProcesadores[0]+ 0.0 ;
+		double porcentajeP4Rechazado = (evento->tiempoProc4Perdidos*100)/ evento->tiemposProcesadores[3]+ 0.0 ;
 		cout<< "Porcentaje del tiempo que pasa ocupado el procesador 1(compu1) con mensajes desechados: "<<porcentajeP1Rechazado <<endl;
 		cout<< "Porcentaje del tiempo que pasa ocupado el procesador 4(compu3) con mensajes desechados: "<<porcentajeP4Rechazado <<endl;
 
 		//1.c
-		double porcentajeMensajesRechazdos = (evento->mensajesEliminados *100.0 )/ evento->mensajes.size();
+		double porcentajeMensajesRechazdos = (evento->mensajesEliminados *100+ 0.0 )/ evento->mensajes.size();
 		cout<< "Porcentaje del total de mensajes rechazados: "<<porcentajeMensajesRechazdos <<endl;
 
 		//1.d
-		double promedioTiempoSistemaMensaje = evento->sumatoriaTiemposMensajes /5000.0;
+		double promedioTiempoSistemaMensaje = evento->sumatoriaTiemposMensajes /tiempoTotal+ 0.0;
 		cout<< "Tiempo promedio en el sistema por cada mensaje: "<<promedioTiempoSistemaMensaje <<endl;
 
 		//1.e
-		double cantidad = 0.0;
+		double cantidad = 0+ 0.0;
 		for (int i = 0; i < evento->mensajes.size(); ++i)
 		{
 			if( !(evento->mensajes[i].estado == 1)){
@@ -238,21 +246,22 @@ int main(int argc, char const *argv[])
 		cout<< "Numero promedio de veces que un mensaje fue devuelto por la computadora 1:  "<<numeroVecesDevuelto <<endl;
 
 		//1.f 
-		double tiempoPromedioColas = evento->tiempoColas /5000.0;
+		cout <<"Prueba colas : "<< evento->tiempoColas << endl;
+		double tiempoPromedioColas = evento->tiempoColas /tiempoTotal+ 0.0;
 		cout<< "Tiempo promedio en colas: "<<tiempoPromedioColas <<endl;
 
 		//1.g
-		double tiempoPromedioTrans = evento->tiempoTransmicion / 5000.0;
+		double tiempoPromedioTrans = evento->tiempoTransmicion / tiempoTotal+ 0.0;
 		cout<< "Tiempo promedio en trasnmicion: "<<tiempoPromedioTrans <<endl;
 
 		//1.h
-		double promedioTrabajoReal = (evento->sumatoriaTiempoReal *100)/ 5000.0;
+		double promedioTrabajoReal = (evento->sumatoriaTiempoReal *100)/ evento->sumatoriaTiemposMensajes+ 0.0;
 		cout<< "Porcentaje del tiempo total de cada mensaje que fue utilizado en procesamiendo real: "<<promedioTrabajoReal <<endl;
 
 		//Reseteamos valores para la siguiente corrida
 		for (int i = 0; i < eventos.size(); ++i)
 		{
-			eventos[i] = 5000*4;
+			eventos[i] = tiempoTotal*4;
 		}
 		eventos[5] = 0;
 		eventos[10] = 0;

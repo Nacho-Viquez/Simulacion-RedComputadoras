@@ -3,7 +3,8 @@
 
 #define PI 3.14159265
 
-Evento::Evento(double X1, double X2, double X3, map<int, vector<double> > mapaDistros){
+Evento::Evento(double X1, double X2, double X3, map<int, vector<double> > mapaDistros, long tiempo){
+	this->tiempoSimulacion = tiempo;
 	this->idMensajeGlobal = 0;
 	this->arriboCompu1C3  = 0;
 	this->arriboCompu1P1  = 0;
@@ -80,6 +81,14 @@ void Evento::LimpiarSimulacion(){
 	this->tiempoTransmicion = 0;
 	this->sumatoriaTiempoReal = 0;
 	this->mensajes.clear();
+	// Colas de transmicion
+	this->colaTransmicion1.clear();
+	this->colaTransmicion2.clear();
+	this->colaTransmicion3.clear();
+	//Colas de mensajes en espera
+	this->colaProc1.clear();
+	this->colaProc2.clear();
+	this->colaProc4.clear();
 }
 
 
@@ -105,7 +114,7 @@ long Evento::FC1 ( long tiempoEvento, vector<long> *eventos){
 			mensajes[this->idMensajeP1].tiempoLlegada = tiempollegada;
 			mensajes[this->idMensajeP1].vecesDevuelto++;
 			colaTransmicion2.push_back(this->idMensajeP1);
-			if (eventos->at(4) == 5000*4){
+			if (eventos->at(4) == this->tiempoSimulacion*4){
 				//Ponemos que el primero de la cola de transicion es el que debe de llegar
 				eventos->at(4) = mensajes[colaTransmicion2[0]].tiempoLlegada;
 				this->arriboCompu2 = colaTransmicion2[0];
@@ -136,7 +145,7 @@ long Evento::FC1 ( long tiempoEvento, vector<long> *eventos){
 			mensajes[this->idMensajeP1].tiempoLlegada = tiempollegada;
 			mensajes[this->idMensajeP1].vecesDevuelto++;
 			colaTransmicion3.push_back(this->idMensajeP1);
-			if (eventos->at(9) == 5000*4){
+			if (eventos->at(9) == this->tiempoSimulacion*4){
 				//Ponemos que el primero de la cola de transicion es el que debe de llegar
 				eventos->at(9) = mensajes[colaTransmicion3[0]].tiempoLlegada;
 				this->arriboCompu3 = colaTransmicion3[0];
@@ -158,7 +167,7 @@ long Evento::FC1 ( long tiempoEvento, vector<long> *eventos){
 	}
 	
 	
-	eventos->at(0) =5000*4;//Desprograma evento 1
+	eventos->at(0) =this->tiempoSimulacion*4;//Desprograma evento 1
 	
 	this->proc1 = false;
 	mensajes[this->idMensajeP1].tiempoInicioTrabajo = 0;
@@ -167,7 +176,10 @@ long Evento::FC1 ( long tiempoEvento, vector<long> *eventos){
 	//Revisar la cola(proc) para atender a un mensaje que espera a ser atendido
 	if (this->colaProc1.size() != 0){
 		//Existen mensajes esperando en la cola de la computadora 1
-		int tiempoEnCola = tiempoEvento - mensajes[colaProc1[0]].tiempoEntradaCola;
+		/*if (relojEvento < mensajes[colaProc1[0]].tiempoEntradaCola ){
+			cout << "tiempo evento : "<<tiempoEvento << ", tiempoEntradaCola : "<< mensajes[colaProc1[0]].tiempoEntradaCola<<endl;
+		}*/
+		long tiempoEnCola = tiempoEvento - mensajes[colaProc1[0]].tiempoEntradaCola;
 		mensajes[colaProc1[0]].tiempoEnColas += tiempoEnCola;
 		this->proc1 = true; //El proc1 vuelve a estar ocupado
 		this->idMensajeP1 = colaProc1[0];
@@ -200,7 +212,7 @@ long Evento::AMC1P1C2(long tiempoEvento,vector<long> *eventos){
 		eventos->at(0) = relojEvento + Manejador((*map).second); // Programamos el fin de trabajo
 		mensajes[idMensajeP1].tiempoInicioTrabajo = relojEvento;
 	}
-	eventos->at(2) = 5000*4;// Desprograma el evento
+	eventos->at(2) = this->tiempoSimulacion*4;// Desprograma el evento
 
 	//Debemos revisar la cola de transicion para poder asignar el proximo arribo
 	if (!colaTransmicion1.empty()){
@@ -229,7 +241,7 @@ long Evento::AMC1P2C2(long tiempoEvento,vector<long> *eventos){
 		eventos->at(0) = relojEvento + Manejador((*map).second); // Programamos el fin de trabajo
 		mensajes[idMensajeP1].tiempoInicioTrabajo = relojEvento;
 	}
-	eventos->at(3) = 5000*4;// Desprograma el evento
+	eventos->at(3) = this->tiempoSimulacion*4;// Desprograma el evento
 
 	//Debemos revisar la cola de transicion para poder asignar el proximo arribo
 	if (!colaTransmicion1.empty()){
@@ -260,7 +272,7 @@ long Evento::AMC1C3( long tiempoEvento, vector<long> *eventos){
 		mensajes[idMensajeP1].tiempoInicioTrabajo = relojEvento;
 
 	}
-	eventos->at(1) = 5000*4; // Se desprograma este evento
+	eventos->at(1) = this->tiempoSimulacion*4; // Se desprograma este evento
 
 	//Se revisa la cola de transicion para ver si hay mensajes que vienen de camino y si los hay ponemos ese valor como evento[1]
 	if (!colaTransmicion1.empty()){
@@ -316,7 +328,7 @@ long Evento::AMC2C1(long tiempoEvento,vector<long> *eventos){
 			mensajes[this->arriboCompu2].tiempoInicioTrabajo = relojEvento; 
 		}
 	}
-	eventos->at(4) = 5000*4; // Desprogramamos el arribo
+	eventos->at(4) = this->tiempoSimulacion*4; // Desprogramamos el arribo
 
 	//Revisamos la cola de transmicion para "reprogramar el arribo desde la comp1"
 	if (colaTransmicion2.size() != 0){
@@ -385,7 +397,8 @@ long Evento::AMC2F(long tiempoEvento,vector<long> *eventos){
 }
 
 //Finalizacion de procesamiento del mensaje en el proc 1 de la computadora 2
-long Evento::EMC2P1(long tiempoEvento,vector<long> *eventos){
+long Evento::FC2P1
+(long tiempoEvento,vector<long> *eventos){
 	long relojEvento = tiempoEvento;
 	//Se envia un mensaje a la computadora 1
 	mensajes[idMensajeP2].tiempoTransmicion += 20; // estadisico
@@ -393,7 +406,7 @@ long Evento::EMC2P1(long tiempoEvento,vector<long> *eventos){
 	mensajes[idMensajeP2].tiempoLlegada = relojEvento +20; // Importanteeeee
 	
 	//Comprobamos si ya se programo el arribo a la computadora 1
-	if (eventos->at(2) == 5000*4) {
+	if (eventos->at(2) == this->tiempoSimulacion*4) {
 		//Hemos de progrmar el siguiete arribo
 		eventos->at(2) = mensajes[colaTransmicion1[0]].tiempoLlegada; // Programamos
 		this->arriboCompu1P1 = colaTransmicion1[0];
@@ -406,7 +419,7 @@ long Evento::EMC2P1(long tiempoEvento,vector<long> *eventos){
 	mensajes[idMensajeP2].tiempoProc2 += tiempoRealProc;
 
 	//Desprogramos valores de la simulacion
-	eventos->at(6) = 5000*4; // Desprogrmamos el evento
+	eventos->at(6) = this->tiempoSimulacion*4; // Desprogrmamos el evento
 	proc2 = false; // ya no esta ocupado 
 	mensajes[idMensajeP2].tiempoInicioTrabajo = 0; // por si acaso
 	this->idMensajeP2 = -1; // quitamos el mensaje actual
@@ -414,6 +427,9 @@ long Evento::EMC2P1(long tiempoEvento,vector<long> *eventos){
 	//Revisamos la cola de la compu2 a ver si hay algun mensaje en espera
 	if(colaProc2.size() != 0){
 		//existen mensajes esperando a ser atendidos
+		/*if (relojEvento < mensajes[colaProc2[0]].tiempoEntradaCola ){
+			cout << "tiempo evento : "<<tiempoEvento << ", tiempoEntradaCola : "<< mensajes[colaProc2[0]].tiempoEntradaCola<<endl;
+		}*/
 		long tiempoEnCola = relojEvento - mensajes[colaProc2[0]].tiempoEntradaCola;
 		mensajes[colaProc2[0]].tiempoEnColas += tiempoEnCola;
 
@@ -431,7 +447,8 @@ long Evento::EMC2P1(long tiempoEvento,vector<long> *eventos){
 }
 
 //Finalizacion de procesamiento del mensaje en el proc 2 de la computadora 2
-long Evento::EMC2P2(long tiempoEvento,vector<long> *eventos){
+long Evento::FC2P2
+(long tiempoEvento,vector<long> *eventos){
 	long relojEvento = tiempoEvento;
 	//Se envia un mensaje a la computadora 1
 	mensajes[idMensajeP3].tiempoTransmicion += 20; // estadisico
@@ -439,7 +456,7 @@ long Evento::EMC2P2(long tiempoEvento,vector<long> *eventos){
 	mensajes[idMensajeP3].tiempoLlegada = relojEvento +20; // Importanteeeee
 	
 	//Comprobamos si ya se programo el arribo a la computadora 1
-	if (eventos->at(3) == 5000*4) {
+	if (eventos->at(3) == this->tiempoSimulacion*4) {
 		//Hemos de progrmar el siguiete arribo
 		eventos->at(3) = mensajes[colaTransmicion1[0]].tiempoLlegada; // Programamos
 		this->arriboCompu1P2 = colaTransmicion1[0];
@@ -452,7 +469,7 @@ long Evento::EMC2P2(long tiempoEvento,vector<long> *eventos){
 	mensajes[idMensajeP3].tiempoProc3 += tiempoRealProc;
 
 	//Desprogramos valores de la simulacion
-	eventos->at(7) = 5000*4; // Desprogrmamos el evento
+	eventos->at(7) = this->tiempoSimulacion*4; // Desprogrmamos el evento
 	proc3 = false; // ya no esta ocupado 
 	mensajes[idMensajeP3].tiempoInicioTrabajo = 0; // por si acaso
 	this->idMensajeP3 = -1; // quitamos el mensaje actual
@@ -460,6 +477,10 @@ long Evento::EMC2P2(long tiempoEvento,vector<long> *eventos){
 	//Revisamos la cola de la compu2 a ver si hay algun mensaje en espera
 	if(colaProc2.size() != 0){
 		//existen mensajes esperando a ser atendidos
+		/*if (relojEvento < mensajes[colaProc2[0]].tiempoEntradaCola ){
+			cout << "tiempo evento : "<<tiempoEvento << ", tiempoEntradaCola : "<< mensajes[colaProc2[0]].tiempoEntradaCola<<endl;
+		}*/
+		
 		long tiempoEnCola = relojEvento - mensajes[colaProc2[0]].tiempoEntradaCola;
 		mensajes[colaProc2[0]].tiempoEnColas += tiempoEnCola;
 
@@ -495,7 +516,7 @@ long Evento::AMC3C1( long tiempoEvento,vector<long> *eventos){
 		mensajes[idMensajeP4].tiempoInicioTrabajo = relojEvento; // Iniciamos una toma del tiempo para el tiempo real y otros 
 
 	}
-	eventos->at(9) = 5000*4;
+	eventos->at(9) = this->tiempoSimulacion*4;
 	//Se revisa la cola de transicion para ver si hay mensajes que vienen de camino y si los hay ponemos ese valor como evento[1]
 	if (!colaTransmicion3.empty()){
 		eventos->at(9) = mensajes[colaTransmicion3[0]].tiempoLlegada; // RePrograma el arribo 
@@ -538,7 +559,8 @@ long Evento::AMC3F(long tiempoEvento,vector<long> *eventos){
 }
 
 //Finalizacion de procesamiento del mensaje de la computadora 3
-long Evento::Emc3(long tiempoEvento,vector<long> *eventos){
+long Evento::FC3
+(long tiempoEvento,vector<long> *eventos){
 	//cout<<"------------- soy el mensaje: "<<this->idMensajeP4<<"-------------------" <<endl;
 
 	long relojEvento = tiempoEvento;
@@ -573,7 +595,7 @@ long Evento::Emc3(long tiempoEvento,vector<long> *eventos){
 		mensajes[idMensajeP4].tiempoTransmicion += 20; 
 		mensajes[idMensajeP4].tiempoLlegada = relojEvento +20; // a esta hora va a llegar
 		colaTransmicion1.push_back(idMensajeP4); //Ponemos el mensaje en la cola de envios "canal"
-		if (eventos->at(1) == 5000*4 ){
+		if (eventos->at(1) == this->tiempoSimulacion*4 ){
 			//Se debe asignar el tiempo del primer elemento de la cola de transicion1 a este evento
 			eventos->at(1) = mensajes[colaTransmicion1[0]].tiempoLlegada;
 			this->arriboCompu1C3 = colaTransmicion1[0]; // el mensaje que va a llegar sera el que este de primero
@@ -586,7 +608,7 @@ long Evento::Emc3(long tiempoEvento,vector<long> *eventos){
 
 
 	//Desprogramamos valores de la simulacion
-	eventos->at(8) = 5000*4;
+	eventos->at(8) = this->tiempoSimulacion*4;
 	this->proc4 = false ; //el proc4 ya no esta ocupado
 	mensajes[idMensajeP4].tiempoInicioTrabajo = 0; 
 	this->idMensajeP4 = -1; // Se desprogama el id
@@ -594,6 +616,9 @@ long Evento::Emc3(long tiempoEvento,vector<long> *eventos){
 	// Revision de la cola de mensajes en espera por ser atendidos a ver si podemos sacar a uno
 	if (colaProc4.size() != 0){
 		//Existen mensajes esperando a ser atendidos por el prov4
+		/*if (relojEvento < mensajes[colaProc4[0]].tiempoEntradaCola ){
+			cout << "tiempo evento : "<<tiempoEvento << ", tiempoEntradaCola : "<< mensajes[colaProc4[0]].tiempoEntradaCola<<endl;
+		}*/
 		long tiempoEnCola = relojEvento - mensajes[colaProc4[0]].tiempoEntradaCola;
 		mensajes[colaProc4[0]].tiempoEnColas += tiempoEnCola;
 
