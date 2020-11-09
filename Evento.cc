@@ -418,8 +418,7 @@ long Evento::AMC2F(long tiempoEvento,vector<long> *eventos){
 }
 
 //Finalizacion de procesamiento del mensaje en el proc 1 de la computadora 2
-long Evento::FC2P1
-(long tiempoEvento,vector<long> *eventos){
+long Evento::FC2P1(long tiempoEvento,vector<long> *eventos){
 	long relojEvento = tiempoEvento;
 	//Se envia un mensaje a la computadora 1
 	mensajes[idMensajeP2].tiempoTransmicion += 20; // estadisico
@@ -468,8 +467,7 @@ long Evento::FC2P1
 }
 
 //Finalizacion de procesamiento del mensaje en el proc 2 de la computadora 2
-long Evento::FC2P2
-(long tiempoEvento,vector<long> *eventos){
+long Evento::FC2P2(long tiempoEvento,vector<long> *eventos){
 	long relojEvento = tiempoEvento;
 	//Se envia un mensaje a la computadora 1
 	mensajes[idMensajeP3].tiempoTransmicion += 20; // estadisico
