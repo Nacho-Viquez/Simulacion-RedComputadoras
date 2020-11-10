@@ -71,7 +71,6 @@ void Evento::LimpiarSimulacion(){
 	this->idMensajeP4 = -1; 
 
 	//Estadisticas
-	//this->tiemposProcesadores.resize(4,0);
 	for (int i = 0; i < tiemposProcesadores.size(); ++i)
 	{	
 		tiemposProcesadores[i] = 0;	
@@ -96,14 +95,14 @@ void Evento::LimpiarSimulacion(){
 }
 
 
-/* @Funcion: simula el evento "Finalización de procesamiento del mensaje de la computadora 1"
+/* @Funcion: simula el evento "Finalizacion de procesamiento del mensaje de la computadora 1"
 			donde se toma en cuenta cuando se tiene que regresar tanto a la computadora 2 como 
-			a la 3 o si se tiene que devolver a su destino. Ademas revisa si hay algún mensaje esperando
+			a la 3 o si se tiene que devolver a su destino. Ademas revisa si hay algun mensaje esperando
 			en su cola para atenderlo.
 	@Param tiempoEvento: reloj principal del sistema
 	@Param eventos: es un vector donde se van modificando los tiempos en los que pasa un determinado 
 					evento.
-	@Return: retorna la hora que tomara el reloj principal de la simulación
+	@Return: retorna la hora que tomara el reloj principal de la simulacion
 */
 long Evento::FC1 ( long tiempoEvento, vector<long> *eventos){
 	long relojEvento = tiempoEvento ; 
@@ -146,8 +145,6 @@ long Evento::FC1 ( long tiempoEvento, vector<long> *eventos){
 			this->sumatoriaTiempoReal += mensajes[this->idMensajeP1].tiempoRealProc;
 		}
 	}else if (mensajes[this->idMensajeP1].tiempoProc2 == 0 && mensajes[this->idMensajeP1].tiempoProc3 == 0){
-		//printf("Me llego un mensaje de la computadora 3\n");
-		//cout<<"Tiempo  proc2: "<< mensajes[this->idMensajeP1].tiempoProc2 <<" Tiempo  proc3: "<< mensajes[this->idMensajeP1].tiempoProc3 <<endl;
 		//El mensaje proviene de la compu 3
 		if (num <= this->X3){
 			//Reenvia a la compu 3
@@ -214,9 +211,8 @@ long Evento::FC1 ( long tiempoEvento, vector<long> *eventos){
 	@Param tiempoEvento: reloj principal del sistema
 	@Param eventos: es un vector donde se van modificando los tiempos en los que pasa un determinado 
 					evento.
-	@Return: retorna la hora que tomara el reloj principal de la simulación
+	@Return: retorna la hora que tomara el reloj principal de la simulacion
 */
-//
 long Evento::AMC1P1C2(long tiempoEvento,vector<long> *eventos){
 	long relojEvento = tiempoEvento;
 	//Revisamos el proc1 a ver su estado
@@ -245,7 +241,16 @@ long Evento::AMC1P1C2(long tiempoEvento,vector<long> *eventos){
 	return relojEvento;
 }
 
-//Arribo de un mensaje a la computadora 1 del proc 2 de la computadora 2
+/* @Funcion: simula el evento "Arribo de un mensaje a la computadora 1 del proc 2 de la computadora 2"
+			en donde si el procesador 1 esta ocupado agrega el mensaje actual a la cola y si no, lo procesa
+			de una vez donde se considera la distribucion indicada por el usuario del tiempo que tarda en
+			atender a ese mensaje. Ademas se revisa la cola de transicion del
+			procesador 1 y en caso de que no este vacia se asigna el proximo en llegar al sistema
+	@Param tiempoEvento: reloj principal del sistema
+	@Param eventos: es un vector donde se van modificando los tiempos en los que pasa un determinado 
+					evento.
+	@Return: retorna la hora que tomara el reloj principal de la simulacion
+*/
 long Evento::AMC1P2C2(long tiempoEvento,vector<long> *eventos){
 	long relojEvento = tiempoEvento;
 	//Revisamos el proc1 a ver su estado
@@ -276,7 +281,17 @@ long Evento::AMC1P2C2(long tiempoEvento,vector<long> *eventos){
 
 }
 
-//Arribo de un mensaje a la computadora 1 de la computadora 3 
+/* @Funcion: simula el evento "Arribo de un mensaje a la computadora 1 de la computadora 3"
+			en donde se revisa si el procesador 1 esta ocupado, si lo esta agrega el mensaje actual a la cola 
+			y si no, lo procesa de una vez donde se considera la distribucion indicada por el usuario del 
+			tiempo que tarda en atender a ese mensaje asi como se asigna el tiempo inicial en el que comienza 
+			a ser atendido. Ademas se revisa la cola de transicion del procesador 1 y en caso de que no este 
+			vacia se asigna el proximo en llegar al sistema.
+	@Param tiempoEvento: reloj principal del sistema
+	@Param eventos: es un vector donde se van modificando los tiempos en los que pasa un determinado 
+					evento.
+	@Return: retorna la hora que tomara el reloj principal de la simulacion
+*/
 long Evento::AMC1C3( long tiempoEvento, vector<long> *eventos){
 	long relojEvento = tiempoEvento;
 	//Se revisa para ver si el proc1 esta ocupado o no
@@ -306,7 +321,17 @@ long Evento::AMC1C3( long tiempoEvento, vector<long> *eventos){
 	return relojEvento;
 }
 
-//Arribo de un mensaje a la computadora 2 de la computadora 1
+/* @Funcion: simula el evento "Arribo de un mensaje a la computadora 2 de la computadora 1"
+			en donde se revisan los procesadores de la compuatdora 2 para ver si alguno esta disponible, en 
+			cuyo caso se calcula el tiempo que tarda en ser procesado con las distribuciones asi como se marca
+			el incio de tiempo en donde comienza ser realmente procesado por el procesador correspondiente, 
+			si no es asi se pone en la cola y se marca el tiempo en el que entro a la cola. Ademas tambien se
+			revisa si hay algun mensaje en la cola de transicion que tenga que ser procesada.
+	@Param tiempoEvento: reloj principal del sistema
+	@Param eventos: es un vector donde se van modificando los tiempos en los que pasa un determinado 
+					evento.
+	@Return: retorna la hora que tomara el reloj principal de la simulacion
+*/
 long Evento::AMC2C1(long tiempoEvento,vector<long> *eventos){
 	long relojEvento = tiempoEvento;
 	//revisamos los proc2 y proc3
@@ -361,7 +386,16 @@ long Evento::AMC2C1(long tiempoEvento,vector<long> *eventos){
 	return relojEvento;
 }
 
-//Arribo de un mensaje a la computadora 2 desde afuera
+/* @Funcion: simula el evento "Arribo de un mensaje a la computadora 2 desde afuera"
+			en donde se revisan los procesadores de la computadora 2 para ver si alguno esta disponible, en 
+			cuyo caso se calcula el tiempo que tarda en ser procesado con las distribuciones asi como se marca
+			el incio de tiempo en donde comienza ser realmente procesado por el procesador correspondiente, 
+			si no es asi se pone en la cola y se marca el tiempo en el que entro a la cola. 
+	@Param tiempoEvento: reloj principal del sistema
+	@Param eventos: es un vector donde se van modificando los tiempos en los que pasa un determinado 
+					evento.
+	@Return: retorna la hora que tomara el reloj principal de la simulacion
+*/
 long Evento::AMC2F(long tiempoEvento,vector<long> *eventos){
 	//printf("Entre al evento 5\n");
 	long relojEvento = tiempoEvento;
@@ -417,7 +451,17 @@ long Evento::AMC2F(long tiempoEvento,vector<long> *eventos){
 	return relojEvento;
 }
 
-//Finalizacion de procesamiento del mensaje en el proc 1 de la computadora 2
+/* @Funcion: simula el evento "Finalizacion de procesamiento del mensaje en el proc 1 de la computadora 2"
+			en donde se marca la hora a la cual llegara el mensaje a la computadora 1, asi como se marca el
+			momento en el que se termina de utilizar el procesador 1 de la computadora 2 y se acumula en 
+			la variable tiempo realproc2. Ademas se calcula el tiempo de transicion que tarda en llegar a 
+			la computadora 1 y se revisa la cola de este procesador para saber si hay algun mensaje para
+			ser procesado y si es así lo procesa y luego lo borra de la cola.
+	@Param tiempoEvento: reloj principal del sistema
+	@Param eventos: es un vector donde se van modificando los tiempos en los que pasa un determinado 
+					evento.
+	@Return: retorna la hora que tomara el reloj principal de la simulacion
+*/
 long Evento::FC2P1(long tiempoEvento,vector<long> *eventos){
 	long relojEvento = tiempoEvento;
 	//Se envia un mensaje a la computadora 1
@@ -466,13 +510,24 @@ long Evento::FC2P1(long tiempoEvento,vector<long> *eventos){
 	return relojEvento;
 }
 
-//Finalizacion de procesamiento del mensaje en el proc 2 de la computadora 2
+/* @Funcion: simula el evento "FFinalizacion de procesamiento del mensaje en el proc 2 de la computadora 2"
+			en donde se marca la hora a la cual llegara el mensaje a la computadora 1, asi como se marca el
+			momento en el que se termina de utilizar el procesador 2 de la computadora 2 y se acumula en 
+			la variable tiempoRealproc3. Ademas se calcula el tiempo de transicion que tarda en llegar a 
+			la computadora 1 y se revisa la cola de este procesador para saber si  hay algun mensaje para ser 
+			procesado y si es así lo procesa y luego lo borra de la cola.
+	@Param tiempoEvento: reloj principal del sistema
+	@Param eventos: es un vector donde se van modificando los tiempos en los que pasa un determinado 
+					evento.
+	@Return: retorna la hora que tomara el reloj principal de la simulacion
+*/
+//
 long Evento::FC2P2(long tiempoEvento,vector<long> *eventos){
 	long relojEvento = tiempoEvento;
 	//Se envia un mensaje a la computadora 1
 	mensajes[idMensajeP3].tiempoTransmicion += 20; // estadisico
 	colaTransmicion1.push_back(idMensajeP3);
-	mensajes[idMensajeP3].tiempoLlegada = relojEvento +20; // Importanteeeee
+	mensajes[idMensajeP3].tiempoLlegada = relojEvento +20; 
 	
 	//Comprobamos si ya se programo el arribo a la computadora 1
 	if (eventos->at(3) == this->tiempoSimulacion*4) {
