@@ -7,45 +7,40 @@
 
 using namespace std;
 class Mensaje;
+
+/*
+ Esta clase se engarga de manipular los eventos que se llevan a cabo en la simulacion
+ asi como los calculos para la generacion de los valores aleatorios que se usa en 
+ ciertos eventos.
+*/
 class Evento
 {
 public:
 	Evento(double X1, double X2, double X3, map<int, vector<double> > map, long tiempo);
 	~Evento();
-	//Declaracion de los eventos de la simulacion
 
 	void LimpiarSimulacion();
 
-	//Finalización de procesamiento del mensaje de la computadora 1
 	long FC1 (long tiempoEvento, vector<long> *eventos);
 
-	//Arribo de un mensaje a la computadora 1 del proc 1 de la computadora 2
 	long AMC1P1C2(long tiempoEvento,vector<long> *eventos);
 
-	//Arribo de un mensaje a la computadora 1 del proc 2 de la computadora 2
 	long AMC1P2C2(long tiempoEvento,vector<long> *eventos);
 
-	//Arribo de un mensaje a la computadora 1 de la computadora 3 
 	long AMC1C3(long tiempoEvento,vector<long> *eventos);
 
-	//Arribo de un mensaje a la computadora 2 de la computadora 1
 	long AMC2C1(long tiempoEvento,vector<long> *eventos);
 
-	//Arribo de un mensaje a la computadora 2 desde afuera
 	long AMC2F(long tiempoEvento,vector<long> *eventos);
 
-	//Finalizacion de procesamiento del mensaje en el proc 1 de la computadora 2
 	long FC2P1(long tiempoEvento,vector<long> *eventos);
 
-	//Finalizacion de procesamiento del mensaje en el proc 2 de la computadora 2
 	long FC2P2(long tiempoEvento,vector<long> *eventos);
 
-	//Arribo de mensaje a la computadora 3 de la computadora 1
 	long AMC3C1(long tiempoEvento,vector<long> *eventos);
 
-	//Arribo de mensaje a la computadora 3 desde afuera
 	long AMC3F(long tiempoEvento, vector<long> *eventos);
-	//Finalizacion de procesamiento del mensaje de la computadora 3
+
 	long FC3(long tiempoEvento,vector<long> *eventos);
 
 	double DistribucionNormalMetodoDirecto(int miu, int varianza );
@@ -72,8 +67,6 @@ public:
 	long arriboCompu1P2;
 	long arriboCompu2;
 	long arriboCompu3;
-
-
 
 	//Atibutos de la simulacion 
 	double X1; 
