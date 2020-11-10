@@ -53,49 +53,78 @@ void obtencionParametros(int escogencia, map<int, vector<double>> * map, int val
 
 	switch (escogencia){
 		case 1 : // Se ocupan dos parametros
-			/*
+			
 			cout << "Digite el valor para mui: ";
 			cin>>miu ;
 			cout << "Digite el valor para la varianza: ";
-			cin>>varianza;*/
-			map->insert(pair< int, vector<double> > (valorD+1 , {1,15,1/*miu,varianza*/}));
+			cin>>varianza;
+			map->insert(pair< int, vector<double> > (valorD+1 , {1,miu,varianza}));
 			break;
 		case 2: 
-			/*
+			
 			cout << "Digite el valor para mui: ";
 			cin>>miu ;
 			cout << "Digite el valor para la varianza: ";
-			cin>>varianza;*/
-			map->insert(pair< int, vector<double> > (valorD+1 , {2,19,1/*miu,varianza*/}));
+			cin>>varianza;
+			map->insert(pair< int, vector<double> > (valorD+1 , {2,miu,varianza}));
 			break;
 		case 3: 
-			/*
+			
 			cout << "Digite el valor para a: ";
 			cin>>a ;
 			cout << "Digite el valor para la b: ";
-			cin>>b;*/
-			map->insert(pair< int, vector<double> > (valorD+1 , {3,12,25/*a,b*/}));
+			cin>>b;
+			map->insert(pair< int, vector<double> > (valorD+1 , {3,a,b}));
 			break; 
 		case 4: 
-			/*
+			
 			cout << "Digite el valor para lambda: ";
-			cin>>lambda ;*/
-
-			map->insert(pair< int, vector<double> > (valorD+1 , {4,0.25/*lambda*/}));
+			cin>>lambda ;
+			map->insert(pair< int, vector<double> > (valorD+1 , {4,lambda}));
 			break;
 		case 5:
-			/*
+			
 			cout << "Digite el valor para k: ";
 			cin>>k ;
 			cout << "Digite el valor para a: ";
 			cin>>a;
 			cout << "Digite el valor para b: ";
-			cin>>b;*/
-			map->insert(pair< int, vector<double> > (valorD+1 , {5,0+ 0.0417,4,8 /*k, a,b*/}));
+			cin>>b;
+			map->insert(pair< int, vector<double> > (valorD+1 , {5, k, a,b}));
 			break;
 		default:
 			printf("default\n");
 	}
+
+}
+
+void intervaloConfianza(vector<double>* v){
+	
+	double varianzaMuestral = 0.0;
+	double mediaMuestral = 0.0;
+	double a , b ;
+
+	for (int i = 0; i < v->size(); ++i){
+	 	mediaMuestral += v->at(i);
+	} 
+	mediaMuestral = mediaMuestral / 10;
+
+	for (int i = 0; i < v->size(); ++i)
+	{
+		varianzaMuestral += (v->at(i) - mediaMuestral) * (v->at(i) - mediaMuestral);
+	}
+	varianzaMuestral = varianzaMuestral / 9;
+
+	a = (varianzaMuestral / 10 );
+	a = pow(a,0.5);
+	a = mediaMuestral - 2.26 * a;
+	b = (varianzaMuestral / 10 );
+	b = pow(b,0.5);
+	b = mediaMuestral + 2.26 * b;
+
+	v->clear();
+	v->push_back(a);
+	v->push_back(b);
 
 }
 
@@ -120,14 +149,14 @@ int main(int argc, char const *argv[])
 	cin>> corridas;
 	cout <<endl;
 	//Probas
-	/*
+	
 	cout << "Digite el valor para X1: "<< endl;
 	cin>>X1 ;
 	cout << "Digite el valor para X2: "<< endl;
 	cin>>X2 ;
 	cout << "Digite el valor para X3: "<< endl;
 	cin>>X3 ;
-	*/
+	
 	map<int , vector<double>> mapaDistros;
 	//Seleccion de distros
 	int escogencia ; 
@@ -166,6 +195,8 @@ int main(int argc, char const *argv[])
 	double porcentajeOcupadoProc1Total = 0,porcentajeOcupadoProc2Total= 0,porcentajeOcupadoProc3Total= 0,porcentajeOcupadoProc4Total= 0;
 	double porcentajeP1RechazadoTotal= 0, porcentajeP4RechazadoTotal= 0, porcentajeMensajesRechazdosTotal= 0, promedioTiempoSistemaMensajeTotal= 0;
 	double numeroVecesDevueltoTotal= 0, tiempoPromedioColasTotal= 0 ,tiempoPromedioTransTotal= 0,promedioTrabajoRealTotal= 0;
+	vector<double> valoresIntervalo;
+
 	//Ciclo principal de la simulacion
 	for (int i = 0; i < corridas; ++i)
 	{
@@ -180,15 +211,13 @@ int main(int argc, char const *argv[])
 					indiceEventoProximo = i;
 				}
 			}
-			//cout<< "Hola este es el siguiente evento en pasar :"<< indiceEventoProximo<<" que tiene un valor de : "<<eventoProximo <<endl;
-
 			//Se realiza el siguiente evento indicado en indiceEventoProximo
 			reloj = manejadorEventos(reloj, &eventos, indiceEventoProximo, evento );
 
 		}
 
 
-		printf("Sali de la simulacion---------------------------------------------------------------------\n");
+		printf("Sali de la corrida no. %d---------------------------------------------------------------------\n",i);
 
 
 		//Calculos finales estadisticos 
@@ -224,6 +253,7 @@ int main(int argc, char const *argv[])
 
 		//1.d
 		double promedioTiempoSistemaMensaje = evento->sumatoriaTiemposMensajes /tiempoTotal+ 0.0;
+		valoresIntervalo.push_back(promedioTiempoSistemaMensaje);
 		promedioTiempoSistemaMensajeTotal += promedioTiempoSistemaMensaje;
 		cout<< "Tiempo promedio en el sistema por cada mensaje: "<<promedioTiempoSistemaMensaje <<endl;
 
@@ -281,6 +311,12 @@ int main(int argc, char const *argv[])
 	cout<< "Tiempo promedio en trasnmicion: "<<tiempoPromedioTransTotal/ corridas  <<endl;
 	cout<< "Tiempo promedio en trasnmicion: "<<tiempoPromedioTransTotal/ corridas  <<endl;
 	cout<< "Porcentaje del tiempo total de cada mensaje que fue utilizado en procesamiendo real: "<<promedioTrabajoRealTotal/ corridas  <<endl;
+	
+	if(corridas == 10){
+		intervaloConfianza(&valoresIntervalo);
+	}
+	cout <<"El intervalo de confianza con una proba de 0.95 comprende de : "<<valoresIntervalo[0]<<", "<<valoresIntervalo[1]<<endl;
+
 	cout << "*******************Final de la simulacion, hasta la proxima********************************** "<<endl;
 
 
