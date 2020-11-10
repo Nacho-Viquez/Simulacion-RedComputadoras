@@ -828,7 +828,13 @@ double Evento::DistribucionDensidad(double k, int a , int b){
 	//cout<<"Este es el valor de retorno del de densidad : "<< retorno <<endl;
 	return retorno;
 }
+/* @Funcion: Metodo que se encarga de decidir a cual de los metodos de generacion de valores aleatorios 
+			basado en distrubuciones llamar, esto lo hace mediante la informacion del vector  que recibe 
+			por parametro. Se llama a este metodo siempre que se quiere crear un valor nuevo.
+	@Param v: vector que utiliza par consultar los datos de las estadisticas.	
 
+	@Return: retorna el valor aleatorio creado
+*/
 double Evento::Manejador(vector<double> v){
 	int caso = v[0];
 	double valor;
