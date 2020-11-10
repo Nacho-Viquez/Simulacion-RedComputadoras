@@ -804,6 +804,12 @@ double Evento::DistribucionUniforme(int a, int b) {
 	return retorno;
 }
 
+/* @Funcion: calcula un valor aleatorio utilizando la funcion de distribucion exponencial 
+			utilizando el lamda indicado por el usuario
+	@Param lamda: parametro para estadisticas (indicado por el usuario)
+	@Return: retorna el resultado final (numero aleatorio) de aplicar la distribucion exponencial
+			 con los parametros indicados
+*/
 double Evento::DistribucionExponencialParametro(double lambda){
 	double retorno ;
 	//srand(time(NULL));
@@ -816,6 +822,14 @@ double Evento::DistribucionExponencialParametro(double lambda){
 	return retorno;
 }
 
+/* @Funcion: calcula un valor aleatorio utilizando la funcion de distribucion de densidad 
+			haciendo uso del metodo inverso.
+	@Param k: parametro para estadisticas (indicado por el usuario)
+	@Param a: parametro para estadisticas (indicado por el usuario) para el rango inferior 
+	@Param b: parametro para estadisticas (indicado por el usuario) para el rango superior
+	@Return: retorna el resultado final (numero aleatorio) obtenido de aplicar la distribucion
+			 de densidad con los parametros indicados
+*/
 double Evento::DistribucionDensidad(double k, int a , int b){
 	//srand(time(NULL));
 	double num1 = drand48() ;
