@@ -626,7 +626,6 @@ long Evento::AMC3C1( long tiempoEvento,vector<long> *eventos){
 					evento.
 	@Return: retorna la hora que tomara el reloj principal de la simulacion
 */
-//Arribo de mensaje a la computadora 3 desde afuera
 long Evento::AMC3F(long tiempoEvento,vector<long> *eventos){
 	long relojEvento = tiempoEvento;
 	Mensaje mensaje(this->idMensajeGlobal);
@@ -657,7 +656,18 @@ long Evento::AMC3F(long tiempoEvento,vector<long> *eventos){
 	return relojEvento;
 }
 
-//Finalizacion de procesamiento del mensaje de la computadora 3
+/* @Funcion: simula el evento "Finalizacion de procesamiento del mensaje de la computadora 3"
+			en donde se determina primeramente si el mensaje sera eliminado o si sera enviado a la 
+			computadora 1, en caso de ser eliminado se guardan todos los datos de ese mensaje, 
+			relacionados con las estadisticas, en variable que lo acumulan para obtener las estadisticas
+			finales. Mientras que si es el caso en que se envian a la computadora 1 primero se programa el
+			tiempo de transmision y luego la hora de llegada a la computadora 1. Por ultimo se revisa si hay
+			algun mensaje en su cola y si es asi lo procesa y lo borra de la cola.
+	@Param tiempoEvento: reloj principal del sistema
+	@Param eventos: es un vector donde se van modificando los tiempos en los que pasa un determinado 
+					evento.
+	@Return: retorna la hora que tomara el reloj principal de la simulacion
+*/
 long Evento::FC3
 (long tiempoEvento,vector<long> *eventos){
 	//cout<<"------------- soy el mensaje: "<<this->idMensajeP4<<"-------------------" <<endl;
@@ -734,7 +744,12 @@ long Evento::FC3
 	return relojEvento;
 }
 
-//Si da un valor negativo reintertar
+/* @Funcion: calcula la funcion de distribucion normal con metodo directo utilizando los miu y varianza
+			indicados por el usuario al inicio del programa
+	@Param miu: parametro para estadisticas (indicado por el usuario)
+	@Param varianza: parametro para estadisticas (indicado por el usuario)
+	@Return: retorna el resultado final de aplicar el metodo directo con los parametros indicados
+*/
 double Evento::DistribucionNormalMetodoDirecto(int miu, int varianza ){
 
 	double num1 = drand48() ;
