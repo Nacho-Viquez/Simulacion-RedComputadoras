@@ -571,8 +571,19 @@ long Evento::FC2P2(long tiempoEvento,vector<long> *eventos){
 	return relojEvento;
 
 }
-
-//Arribo de mensaje a la computadora 3 de la computadora 1
+/* @Funcion: simula el evento de arribo de un mensaje ala computadora 3 de la computadora 1, en este metodo
+			se revisa el procesador de la computadora 3 para revisar si se encuentra ocupado, de estarlo 
+			el mensaje que acaba de arribar se pone en la cola del procesador y se empieza el contador de este 
+			mensaje para calcular el tiempo que ha estado en cola. De no se asi, si el procesador esta desocupado
+			se pone al mensaje que arribo a trabajar en este procesador, se determina el tiempo de finalizacion de 
+			trabajo del procesador y se hace una toma de tiempo del momento en el que el mensaje empezo el tiempo 
+			real de procesamiento para su posterior uso en estadisticas. Tambien revisa la cola de mensajes en transicion
+			para programar el proximo arribo.
+	@Param tiempoEvento: reloj principal del sistema
+	@Param eventos: es un vector donde se van modificando los tiempos en los que pasa un determinado 
+					evento.
+	@Return: retorna la hora que tomara el reloj principal de la simulacion
+*/
 long Evento::AMC3C1( long tiempoEvento,vector<long> *eventos){
 	long relojEvento = tiempoEvento; // Adelantamos el relo
 	//Revisar el proc4
@@ -601,6 +612,20 @@ long Evento::AMC3C1( long tiempoEvento,vector<long> *eventos){
 	return relojEvento;
 }
 
+
+/* @Funcion: simula el evento de la llegada de un mensaje a la computadora 3 desde afuera del sistema. En este mentodo 
+			se revisa el procesador de la computadora 3 para revisar si se encuentra ocupado, de estarlo 
+			el mensaje que acaba de arribar se pone en la cola del procesador y se empieza el contador de este 
+			mensaje para calcular el tiempo que ha estado en cola. De no se asi, si el procesador esta desocupado
+			se pone al mensaje que arribo a trabajar en este procesador, se determina el tiempo de finalizacion de 
+			trabajo del procesador y se hace una toma de tiempo del momento en el que el mensaje empezo el tiempo 
+			real de procesamiento para su posterior uso en estadisticas. Ademas se reprograma este mismo evento usando la 
+			distribucion.
+	@Param tiempoEvento: reloj principal del sistema
+	@Param eventos: es un vector donde se van modificando los tiempos en los que pasa un determinado 
+					evento.
+	@Return: retorna la hora que tomara el reloj principal de la simulacion
+*/
 //Arribo de mensaje a la computadora 3 desde afuera
 long Evento::AMC3F(long tiempoEvento,vector<long> *eventos){
 	long relojEvento = tiempoEvento;
