@@ -763,7 +763,13 @@ double Evento::DistribucionNormalMetodoDirecto(int miu, int varianza ){
 	return retorno;
 }
 
-//Si da un valor negativo reintertar
+
+/* @Funcion: Metodo que se encarga de calcular un valor aleatorio usando el metodo de 
+			la distribucion normal mediante el metodo del teorema del limite central
+	@Param miu: parametro necesario para calculos estadisticos
+	@Param varianza: parametro necesario para calculos estadisticos
+	@Return: retorna el valor aleatorio creado
+*/
 double Evento::DistribucionNormalMetodoTLC(int miu, int varianza){
 	double retorno ; 
 	double z = 0;
@@ -782,6 +788,14 @@ double Evento::DistribucionNormalMetodoTLC(int miu, int varianza){
  	return retorno;
 }
 
+/* @Funcion: Metodo que se encarga de calcular un valor aleatorio usando el metodo de 
+			la distribucion uniforme
+	@Param miu: parametro necesario para calculos estadisticos, define el valor inferior del 
+				intervalo.	
+	@Param varianza: parametro necesario para calculos estadisticos, define el valor superior del
+				intervalo.
+	@Return: retorna el valor aleatorio creado
+*/
 double Evento::DistribucionUniforme(int a, int b) {
 	//srand(time(NULL));
 	double num1 =drand48() ;
