@@ -1,7 +1,21 @@
 #include "Mensaje.h"
 #include "Evento.h"
 #include <map>
-
+/* @Funcion: Maneja los eventos que han de pasar en la simulacion. Dependiendo del parametro 
+			indiceEventoProximo se toma la decision de a que metodo de la clase Evento llamar 
+			con el fin de modificar valores de la simulacion entre los que se incluye el mover 
+			mensajes entre las diferentes computadoras, calcular valores estadisticos y actualizar
+			el reloj de la simulacion.
+	@Param reloj: reloj principal de la simulacion.
+	@Param eventos: es un vector donde se van modificando los tiempos en los que pasa un determinado 
+			evento.
+	@Param indiceEventoProximo:  indica que evento ha de realizarce a continuacion, 
+			es el indice que obtenemos al buscar el tiempo de ejecucion menor entre todos los eventos
+			a ejecutarse.
+	@Param evento: instancia de la clase Evento, utilizada para poder llamar a los metodos de los 
+			eventos nesesarios en la simulacion.
+	@Return: retorna la nueva actualizacion del reloj, es el "estado" actual del reloj de la simulacion.
+*/
 long manejadorEventos(long reloj,vector<long> *eventos, long indiceEventoProximo, Evento *evento){
 	long relojActual = eventos->at(indiceEventoProximo);
 
@@ -47,7 +61,17 @@ long manejadorEventos(long reloj,vector<long> *eventos, long indiceEventoProximo
 	return relojActual;
 }
 
-
+/* @Funcion: Metodo que se encarga de realizar la recoleccion de los parametros para las distintas 
+			distribuciones probabilisticas a usar en la simulacion.
+	@Param escogencia: valor que es usado para saber cual distribucion se desea usar ademas permite 
+			controlar cuantos y cuales parametros se le solicitaran al usuario
+	@Param map: Estructura de datos que se usa para almacenar los datos ingresados por el usuario sobre 
+			las diferentes distribuciones que se van a utilizar. La llave del mapa identifica el valor 
+			de asignacion para las diferentes partes de la simulacion. EJ: D6 se representa como 6 en la llave.
+			El valor de la llave es un vector en donde se almacenan los datos especificos y requeridos 
+			para llevar a cabo los calculos de la distribucion seleccionada.
+	@Param valorD: Indica a que valor de D# se refiere. 
+*/
 void obtencionParametros(int escogencia, map<int, vector<double>> * map, int valorD){
 	double miu, varianza,a,b, k, lambda;
 
@@ -97,7 +121,12 @@ void obtencionParametros(int escogencia, map<int, vector<double>> * map, int val
 	}
 
 }
-
+/* @Funcion: Metodo que se encarga de calcular el intervalo de confianza para los valores de tiempo promedio
+			en el sistema de un mensaje. Se calcula con una probabilidad de 0.95, y unicamente con 
+			10 corridas.
+	@Param v: vector con los valores del tiempo promedio de un mensaje en el sistema para cada una de las 
+			corridas. El tamaño de este vector es de 10 siempre.
+*/
 void intervaloConfianza(vector<double>* v){
 	
 	double varianzaMuestral = 0.0;
@@ -129,8 +158,10 @@ void intervaloConfianza(vector<double>* v){
 }
 
 
-/*
- * main del proyecto 
+/* @Funcion: main de la simulacion. Lleva a cabo todo el cuerpo de la simulacion, asi como el llamado a 
+			metodos paa la correcta ejecucion de esta. Imprime datos estadisticos por simulacion asi como 
+			datos finales promedio para la corridas solicitadas
+			NOTA : El intervalo de confianza solo se imprime cuando son 10 ejecuciones.
 */
 int main(int argc, char const *argv[])
 {
@@ -320,8 +351,6 @@ int main(int argc, char const *argv[])
 	cout <<"El intervalo de confianza con una proba de 0.95 comprende de : "<<valoresIntervalo[0]<<", "<<valoresIntervalo[1]<<endl;
 
 	cout << "*******************Final de la simulacion, hasta la proxima********************************** "<<endl;
-
-
 
 	delete(evento);
 	return 0;
