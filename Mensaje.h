@@ -1,6 +1,10 @@
 #include <iostream>
 using namespace std;
 
+/* Esta clase simula el mensaje que se pasara entre los procesadores del sistema. Ademas contiene
+	los atributos necesarios para calcular las estadisticas. 
+*/
+
 class Mensaje
 {
 public:
@@ -8,9 +12,6 @@ public:
 	~Mensaje();
 	long getIDMensaje();
 
-
-
-//private: 
 	//Atributos para los calculos estadisticos
 	long idMensaje ; 
 	long tiempoProc1 ; //Computadora 1
