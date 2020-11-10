@@ -251,13 +251,6 @@ int main(int argc, char const *argv[])
 		porcentajeMensajesRechazdosTotal += porcentajeMensajesRechazdos;
 		cout<< "Porcentaje del total de mensajes rechazados: "<<porcentajeMensajesRechazdos <<endl;
 
-		//1.d
-		double promedioTiempoSistemaMensaje = evento->sumatoriaTiemposMensajes /tiempoTotal+ 0.0;
-		valoresIntervalo.push_back(promedioTiempoSistemaMensaje);
-		promedioTiempoSistemaMensajeTotal += promedioTiempoSistemaMensaje;
-		cout<< "Tiempo promedio en el sistema por cada mensaje: "<<promedioTiempoSistemaMensaje <<endl;
-
-		//1.e
 		double cantidad = 0+ 0.0;
 		for (int i = 0; i < evento->mensajes.size(); ++i)
 		{
@@ -266,18 +259,27 @@ int main(int argc, char const *argv[])
 				cantidad++;			
 			}
 		}
-		
+
+
+		//1.d
+		double promedioTiempoSistemaMensaje = evento->sumatoriaTiemposMensajes /cantidad+ 0.0;
+		valoresIntervalo.push_back(promedioTiempoSistemaMensaje);
+		promedioTiempoSistemaMensajeTotal += promedioTiempoSistemaMensaje;
+		cout<< "Tiempo promedio en el sistema por cada mensaje: "<<promedioTiempoSistemaMensaje <<endl;
+
+		//1.e
 		double numeroVecesDevuelto = evento->sumatoriaVecesDevuelto  / cantidad;
 		numeroVecesDevueltoTotal += numeroVecesDevuelto;
 		cout<< "Numero promedio de veces que un mensaje fue devuelto por la computadora 1:  "<<numeroVecesDevuelto <<endl;
 
 		//1.f 
-		double tiempoPromedioColas = evento->tiempoColas /tiempoTotal+ 0.0;
+		double tiempoPromedioColas = evento->tiempoColas /cantidad+ 0.0;
 		tiempoPromedioColasTotal += tiempoPromedioColas;
 		cout<< "Tiempo promedio en colas: "<<tiempoPromedioColas <<endl;
 
 		//1.g
-		double tiempoPromedioTrans = evento->tiempoTransmicion / tiempoTotal+ 0.0;
+		double tiempoPromedioTrans = evento->tiempoTransmicion / cantidad+ 0.0;
+		
 		tiempoPromedioTransTotal += tiempoPromedioTrans;
 		cout<< "Tiempo promedio en trasnmicion: "<<tiempoPromedioTrans <<endl;
 
